@@ -6,7 +6,7 @@ import csv
 
 def main():
 
-    
+
     global mu,Re,a,n
 
     Re = 6378
@@ -41,7 +41,8 @@ def main():
 
     # generate a random set of chaser and target values
 
-    for x in range(1,100):
+
+    for x in range(1, 100):
 
         r0random = np.random.uniform(low=100, high=10000.0, size=3)
         v0random = np.random.uniform(low=-5.0, high=10.0, size=3)
@@ -114,24 +115,40 @@ def main():
         deltavf = vr.dot(deltar0) + vv.dot(deltav0)
         # deltav = deltavf - deltav0
 
-        print("deltarf =\n", deltarf)
-        print("deltavf =\n", deltavf)
+        # print("deltarf =\n", deltarf)
+        # print("deltavf =\n", deltavf)
+
+        deltarv0 = np.concatenate((deltar0, deltav0)).reshape((1, 6))
+        deltarvf = np.concatenate((deltarf, deltavf)).reshape((1, 6))
+
+        delta = np.concatenate((deltarv0, deltarvf)).reshape(2, 6)
 
         # Save the initial and final states in the csv file
-        trainingFile = open("trainingData.csv", 'w')
-        saveTrainingData = csv.writer(trainingFile)
 
-        saveTrainingData.writerow(deltar0)
-        saveTrainingData.writerow(deltav0)
-        saveTrainingData.writerow(deltarf)
-        saveTrainingData.writerow(deltavf)
-        trainingFile.close()
+        # trainingFileInput = open("trainingDataInput.csv", 'ab')
+        # np.savetxt(trainingFileInput, deltarv0, delimiter=',')
+        # trainingFileInput.close()
+        #
+        # trainingFileOutput = open("trainingDataOutput.csv", 'ab')
+        # np.savetxt(trainingFileOutput, deltarvf, delimiter=',')
+        # trainingFileOutput.close()
+
+        # This is the test data, comment out if generating data for training
+        testFileInput = open("testData.csv", 'ab')
+        np.savetxt(testFileInput, deltarv0, delimiter=',')
+        testFileInput.close()
+
+        testFileOutput = open("outputTestData.csv", 'ab')
+        np.savetxt(testFileOutput, deltarvf, delimiter=',')
+        testFileOutput.close()
 
         del r0random, v0random, rtargrandom, vtargrandom
 
+    pass
+
 
 def oe_to_rv(oe):
-    
+
     """Input a set of orbital elements and returns a state vector"""
 
     a=oe[0]
@@ -146,9 +163,9 @@ def oe_to_rv(oe):
         print('Invalid orbital elements')
 
     xhat = np.array([1, 0, 0])
-    yhat = np.array([0, 0, 0]) 
+    yhat = np.array([0, 0, 0])
     zhat = np.array([1, 0, 0])
-    
+
     r = (h**2/mu) * (1/(1+e*np.cos(theta))) * np.array([np.cos(theta), np.sin(theta), 0]).T
     v = mu/h*np.array([-np.sin(theta), e + np.cos(theta), 0]).T
 
@@ -168,7 +185,7 @@ def oe_to_rv(oe):
 
 
 #def diffCW():
-    
+
    # """Solves the difeerential form of the CW equationsi"""
    # a = 5000 + Re
     # n = np.sqrt(mu / a**3)
