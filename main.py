@@ -2,16 +2,14 @@
 
 import numpy as np
 import math
-import csv
+
 
 def main():
-
-
-    global mu,Re,a,n
+    global mu, Re, a, n
 
     Re = 6378
     mu = 398600
-
+# """
 #    # Example 7.2 from Curtis
 #
 #    # Target
@@ -40,110 +38,102 @@ def main():
     #Assume a known state vector (from curtis)
 
     # generate a random set of chaser and target values
-
-
-    for x in range(1, 100):
-
+    for x in range(1, 10):
+        # Space Station
         r0random = np.random.uniform(low=100, high=10000.0, size=3)
-        v0random = np.random.uniform(low=-5.0, high=10.0, size=3)
+        v0random = np.random.uniform(low=-3.0, high=3.0, size=3)
 
         # range for random value generation
-        rdiff = 40
+        rdiff = 20
         vdiff = 0.1
 
+        # Spacecraft
         rtargrandom = np.array([np.random.uniform(low=r0random[0] - rdiff, high=r0random[0] + rdiff),
                                 np.random.uniform(low=r0random[1] - rdiff, high=r0random[1] + rdiff),
                                 np.random.uniform(low=r0random[2] - rdiff, high=r0random[2] + rdiff)])
 
-        vtargrandom = np.array([np.random.uniform(low=v0random[0] - vdiff, high=v0random[0] + vdiff),
+        vtargrandom = np.array([np.random.uniform(low=v0random[0] - vdiff,high=v0random[0] + vdiff),
                                 np.random.uniform(low=v0random[1] - vdiff, high=v0random[1] + vdiff),
                                 np.random.uniform(low=v0random[2] - vdiff, high=v0random[2] + vdiff)])
 
+        """
+        Space station (target vechicle)
+        r0 = np.array([1622.39, 5305.10, 3717.44])
+        v0 = np.array([-7.29977, 0.492357, 2.48318])
+        # Chaser
+        rtarg = np.array([1612.5, 5310.19, 3750.33])
+        vtarg = np.array([-7.35321, 0.463856, 2.46920])
+        """
 
-        # Space station (target vechicle)
-        # r0 = np.array([1622.39, 5305.10, 3717.44])
-        # v0 = np.array([-7.29977, 0.492357, 2.48318])
-        #
-        # # Chaser
-        # rtarg = np.array([1612.5,5310.19,3750.33])
-        # vtarg = np.array([-7.35321, 0.463856, 2.46920])
+        # space Station
+        r0, v0 = r0random, v0random
+        rtarg, vtarg = rtargrandom, vtargrandom
 
-        r0 = r0random
-        v0 = v0random
-
-        rtarg = rtargrandom
-        vtarg = vtargrandom
-
-        ihat = np.array([r0[0], r0[1], r0[2]])/np.linalg.norm(r0)
-        jhat = np.array([v0[0], v0[1], v0[2]])/np.linalg.norm(v0)
+        ihat = r0/np.linalg.norm(r0)
+        jhat = v0/np.linalg.norm(v0)
         khat = np.cross(ihat, jhat)
 
-        #coordinate transformation
-
-        Q = np.concatenate((ihat, jhat, khat)).reshape((3, 3))
+        # coordinate transformation from geocentric to equatorial to space station
+        Q = np.concatenate(([ihat], [jhat], [khat]))
 
         deltar = rtarg - r0
-
         # Mean motion of the space station
         n = np.linalg.norm(v0)/np.linalg.norm(r0)
 
-
-        deltav = vtarg - v0 - n*(np.cross(khat,deltar))
-
+        Omega_space_station = n*khat
+        deltav = vtarg - v0 - np.cross(Omega_space_station, deltar)
         deltar0 = Q.dot(deltar)
         deltav0 = Q.dot(deltav)
+
 
         #time of the 2-impulse maneuver
         t = 8 * 60**2  # hours to seconds
 
-
         # matrix form CW
-        rr = np.array([4-3*np.cos(n*t), 0, 0, 6*(np.sin(n*t)-n*t), 1, 0, 0, 0, np.cos(n*t)]).reshape((3, 3))
-        rv = np.array([(1/n*np.sin(n*t)), 2/n*(1-np.cos(n*t)), 0, 2/n*(np.cos(n*t)-1), (1/n)*(4*np.sin(n*t)-3*n*t), 0, 0,0,1/n*np.sign(n*t)]).reshape((3,3))
-        vr = np.array([3*n*np.sin(n*t),0,0,6*n*(np.cos(n*t)-1), 0, 0, 0, 0, -n*np.sin(n*t)]).reshape((3,3))
-        vv = np.array([np.cos(n*t), 2*np.sin(n*t), 0, -2*np.sin(n*t), 4*np.cos(n*t)-3, 0, 0, 0, np.cos(n*t)]).reshape((3,3))
+        rr = np.array([4-3*np.cos(n*t), 0, 0,
+                      6*(np.sin(n*t)-n*t), 1, 0,
+                      0, 0, np.cos(n*t)]).reshape((3, 3))
+        rv = np.array([(1/n*np.sin(n*t)), 2/n*(1-np.cos(n*t)), 0,
+                       2/n*(np.cos(n*t)-1), (1/n)*(4*np.sin(n*t)-3*n*t), 0,
+                       0, 0, 1/n*np.sign(n*t)]).reshape((3, 3))
+        vr = np.array([3*n*np.sin(n*t), 0, 0,
+                      6*n*(np.cos(n*t)-1), 0, 0,
+                      0, 0, -n*np.sin(n*t)]).reshape((3, 3))
+        vv = np.array([np.cos(n*t), 2*np.sin(n*t), 0,
+                       -2*np.sin(n*t), 4*np.cos(n*t)-3, 0,
+                       0, 0, np.cos(n*t)]).reshape((3, 3))
 
-        # print("rr =\n", rr)
-        # print("rv =\n", rv)
-        # print("vr =\n", vr)
-        # print("vv = \n", vv)
-
-        #First CW equation deltarf
+        # First CW equation deltarf
         deltarf = rr.dot(deltar0) + rv.dot(deltav0)
-
-        #Second CW equation deltavf
+        # Second CW equation deltavf
         deltavf = vr.dot(deltar0) + vv.dot(deltav0)
-        # deltav = deltavf - deltav0
-
-        # print("deltarf =\n", deltarf)
-        # print("deltavf =\n", deltavf)
 
         deltarv0 = np.concatenate((deltar0, deltav0)).reshape((1, 6))
         deltarvf = np.concatenate((deltarf, deltavf)).reshape((1, 6))
 
-        delta = np.concatenate((deltarv0, deltarvf)).reshape(2, 6)
-
+        print(rr, "\n")
+        delta = np.concatenate(([deltarv0], [deltarvf]))
+        # print(delta)
         # Save the initial and final states in the csv file
 
-        # trainingFileInput = open("trainingDataInput.csv", 'ab')
-        # np.savetxt(trainingFileInput, deltarv0, delimiter=',')
+        # trainingFileInput = open("trainingData.csv", 'ab')
+        # np.savetxt(trainingFileInput, delta, delimiter=',')
         # trainingFileInput.close()
-        #
+
         # trainingFileOutput = open("trainingDataOutput.csv", 'ab')
         # np.savetxt(trainingFileOutput, deltarvf, delimiter=',')
         # trainingFileOutput.close()
 
-        # This is the test data, comment out if generating data for training
-        testFileInput = open("testData.csv", 'ab')
-        np.savetxt(testFileInput, deltarv0, delimiter=',')
-        testFileInput.close()
-
-        testFileOutput = open("outputTestData.csv", 'ab')
-        np.savetxt(testFileOutput, deltarvf, delimiter=',')
-        testFileOutput.close()
+        # # This is the test data, comment out if generating data for training
+        # testFileInput = open("testData.csv", 'ab')
+        # np.savetxt(testFileInput, deltarv0, delimiter=',')
+        # testFileInput.close()
+        #
+        # testFileOutput = open("outputTestData.csv", 'ab')
+        # np.savetxt(testFileOutput, deltarvf, delimiter=',')
+        # testFileOutput.close()
 
         del r0random, v0random, rtargrandom, vtargrandom
-
     pass
 
 
