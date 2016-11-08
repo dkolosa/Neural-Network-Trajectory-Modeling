@@ -38,7 +38,7 @@ def main():
     #Assume a known state vector (from curtis)
 
     # generate a random set of chaser and target values
-    for x in range(1, 10):
+    for x in range(1, 11):
         # Space Station
         r0random = np.random.uniform(low=100, high=10000.0, size=3)
         v0random = np.random.uniform(low=-3.0, high=3.0, size=3)
@@ -111,9 +111,8 @@ def main():
         deltarv0 = np.concatenate((deltar0, deltav0)).reshape((1, 6))
         deltarvf = np.concatenate((deltarf, deltavf)).reshape((1, 6))
 
-        print(rr, "\n")
         delta = np.concatenate(([deltarv0], [deltarvf]))
-        # print(delta)
+        print(delta, "\n", "iter: ", x)
         # Save the initial and final states in the csv file
 
         # trainingFileInput = open("trainingData.csv", 'ab')
