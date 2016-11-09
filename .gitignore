@@ -28,7 +28,7 @@
 *.sql
 *.sqliteaa
 .idea
-
+*.csv
 
 # OS generated files #
 ######################
