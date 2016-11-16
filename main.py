@@ -5,7 +5,9 @@ import math
 
 
 def main():
-    global mu, Re, a, n
+
+    """Solving the linear CW equations given a set of state vectors for a target and chaser vehicle"""
+    # global mu, Re, a, n
 
     Re = 6378
     mu = 398600
@@ -35,20 +37,20 @@ def main():
 #    rv0 = oe_to_rv(oeTarg)
 #    rvChase = oe_to_rv(oeChase)
 
-    #Assume a known state vector (from curtis)
+    # Assume a known state vector (from curtis)
 
     # Delete file contents
-    # training_File_Input = open("trainingData.csv", 'w')
-    # training_File_Input.close()
+    remove_data('trainingData.csv')
+
 
     # generate a random set of chaser and target values
     for x in range(100):
         # Space Station
-        r0random = np.random.uniform(low=100, high=1000.0, size=3)
-        v0random = np.random.uniform(low=-3.0, high=3.0, size=3)
+        r0random = np.random.uniform(low=10, high=100.0, size=3)
+        v0random = np.random.uniform(low=1.0, high=2.0, size=3)
 
         # range for random value generation
-        rdiff = 30
+        rdiff = 10
         vdiff = 0.1
 
         # Spacecraft
@@ -90,8 +92,15 @@ def main():
         deltav0 = Q.dot(deltav)
 
         # time of the 2-impulse maneuver
-        t = 8 * 60**2  # hours to seconds
+        # solve cw over a timespan
+        tfinal = 8 * 60**2  # hours to seconds
+        # t = np.linspace(0, tfinal, 100)
+        t = tfinal
 
+        # deltavf = np.zeros((len(t), 3))
+        # deltarf = np.zeros((len(t), 3))
+
+        # for index in range(len(t)):
         # matrix form CW
         rr = np.array([4-3*np.cos(n*t), 0, 0,
                       6*(np.sin(n*t)-n*t), 1, 0,
@@ -106,34 +115,42 @@ def main():
                        -2*np.sin(n*t), 4*np.cos(n*t)-3, 0,
                        0, 0, np.cos(n*t)]).reshape((3, 3))
 
-        deltav0p = -np.linalg.inv(rv).dot(np.dot(rr, deltar0))
+
+            # deltav0p = -np.linalg.inv(rv).dot(np.dot(rr, deltar0))
+            # # First CW equation deltarf is assumed zero
+            # deltarf[t:] = [rr.dot(deltar0) + rv.dot(deltav0)]
+            # # Second CW equation deltavf
+            # deltavf[t:] = [vr.dot(deltar0) + vv.dot(deltav0)]
 
         # First CW equation deltarf is assumed zero
-        # deltarf = rr.dot(deltar0) + rv.dot(deltav0)
+        deltarf = rr.dot(deltar0) + rv.dot(deltav0)
         # Second CW equation deltavf
-        deltavf = vr.dot(deltar0) + vv.dot(deltav0p)
+        deltavf = vr.dot(deltar0) + vv.dot(deltav0)
 
         deltarv0 = np.concatenate((deltar0, deltavf)).reshape((2, 3))
         # deltarvf = np.concatenate((deltarf, deltavf)).reshape((1, 6))
 
-        # Save the initial and final states in the csv file
+        # Save the initial and final states in the csv file to use for training
+        # save_data('trainingData.csv', deltarv0)
 
-        # training_File_Input = open("trainingData.csv", 'ab')
-        # np.savetxt(training_File_Input, deltarv0, delimiter=',')
-        # training_File_Input.close()
-
-        # This is the test data, comment out if generating data for training
-        testFileInput = open("testData.csv", 'ab')
-        np.savetxt(testFileInput, np.reshape(deltar0, (1, 3)), delimiter=',')
-        testFileInput.close()
-
-        testFileOutput = open("outputTestData.csv", 'ab')
-        np.savetxt(testFileOutput, np.reshape(deltavf, (1, 3)), delimiter=',')
-        testFileOutput.close()
+        # Save the test data and the output data
+        save_data('testData.csv', np.reshape(deltar0, (1, 3)))
+        save_data('outputTestData.csv', np.reshape(deltavf, (1, 3)))
 
         del r0random, v0random, rtargrandom, vtargrandom
     pass
 
+
+def save_data(file,data):
+    """Save the file contents"""
+    with open(file, 'ab') as data_file:
+        np.savetxt(data_file, data, delimiter=',')
+
+
+def remove_data(file):
+    """Delete the file contents only"""
+    with open(file, 'w') as f:
+        pass
 
 def oe_to_rv(oe):
 
