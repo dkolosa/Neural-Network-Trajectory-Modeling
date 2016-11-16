@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import numpy as np
 import math
@@ -44,10 +44,11 @@ def main():
 
 
     # generate a random set of chaser and target values
-    for x in range(100):
+
+    for x in range(20):
         # Space Station
-        r0random = np.random.uniform(low=10, high=100.0, size=3)
-        v0random = np.random.uniform(low=1.0, high=2.0, size=3)
+        r0random = np.random.uniform(low=10, high=50.0, size=3)
+        v0random = np.random.uniform(low=0.10, high=2.0, size=3)
 
         # range for random value generation
         rdiff = 10
@@ -116,24 +117,26 @@ def main():
                        0, 0, np.cos(n*t)]).reshape((3, 3))
 
 
-            # deltav0p = -np.linalg.inv(rv).dot(np.dot(rr, deltar0))
+        deltav0p = -np.linalg.inv(rv).dot(np.dot(rr, deltar0))
+
             # # First CW equation deltarf is assumed zero
             # deltarf[t:] = [rr.dot(deltar0) + rv.dot(deltav0)]
             # # Second CW equation deltavf
             # deltavf[t:] = [vr.dot(deltar0) + vv.dot(deltav0)]
 
         # First CW equation deltarf is assumed zero
-        deltarf = rr.dot(deltar0) + rv.dot(deltav0)
+        deltarf = rr.dot(deltar0) + rv.dot(deltav0p)
         # Second CW equation deltavf
-        deltavf = vr.dot(deltar0) + vv.dot(deltav0)
+        deltavf = vr.dot(deltar0) + vv.dot(deltav0p)
 
-        deltarv0 = np.concatenate((deltar0, deltavf)).reshape((2, 3))
+
+        deltarv0 = np.concatenate((deltar0, deltav0p)).reshape((1, 6))
         # deltarvf = np.concatenate((deltarf, deltavf)).reshape((1, 6))
 
         # Save the initial and final states in the csv file to use for training
-        # save_data('trainingData.csv', deltarv0)
+        save_data('trainingData.csv', deltarv0)
 
-        # Save the test data and the output data
+        # Save the test data and the output test data
         save_data('testData.csv', np.reshape(deltar0, (1, 3)))
         save_data('outputTestData.csv', np.reshape(deltavf, (1, 3)))
 
@@ -152,64 +155,64 @@ def remove_data(file):
     with open(file, 'w') as f:
         pass
 
-def oe_to_rv(oe):
 
-    """Input a set of orbital elements and returns a state vector"""
-
-    a=oe[0]
-    e=oe[1]
-    i=oe[2]
-    w=oe[3]
-    Omega=oe[4]
-    theta=oe[5]
-
-    if a<0 or e<0 or e>1 or math.fabs(1) > 2*math.pi or math.fabs(Omega)> 2*math.pi or math.fabs(w) > 2*math.pi:
-
-        print('Invalid orbital elements')
-
-    xhat = np.array([1, 0, 0])
-    yhat = np.array([0, 0, 0])
-    zhat = np.array([1, 0, 0])
-
-    r = (h**2/mu) * (1/(1+e*np.cos(theta))) * np.array([np.cos(theta), np.sin(theta), 0]).T
-    v = mu/h*np.array([-np.sin(theta), e + np.cos(theta), 0]).T
-
-    nu = kepler(oe,t)
-    nhat = math.cos(Omega)*xhat+math.sin(Omega)*yhat
-    rhatT=-math.cos(i)*math.sin(Omega)*xhat+math.cos(i)*math.cos(Omega)*yhat+math.sin(i)*zhat
-    rmag=a*(1-e**2)/(1+e*math.cos(nu))
-    vmag=math.sqrt(mu/rmag*(2-rmag/a))
-    gamma=math.atan2(e*math.sin(nu),1+e*math.cos(nu))
-    u=w+nu
-    rhat=math.cos(u)*nhat+math.sin(u)*rhatT
-    vhat=math.sin(gamma-u)*nhat+math.cos(gamma-u)*rhatT
-    r=rmag*rhat
-    v=vmag*vhat
-
-    return np.array([r, v])
-
-
-#def diffCW():
-
-   # """Solves the difeerential form of the CW equationsi"""
-   # a = 5000 + Re
-    # n = np.sqrt(mu / a**3)
-    #
-    # t = np.linspace(0,100,100)
-    # x0 = np.array([a, 0.0, 0.0])
-    # v0 = np.array([0, n, 0])
-    #
-    # y = odeint(clohessyWiltshireode, [a, .5*a, .5*a, 0.0, n, 0], t)
-    #
-    # plt.figure(1)
-    # plt.plot(t, y[:,0])
-    # plt.xlabel('t')
-    # plt.ylabel('xyz')
-    # plt.show()
-
-# Clohessy Wilshire model differential
-#def clohessyWiltshireode(x,t):
+# def oe_to_rv(oe):
 #
+#     """Input a set of orbital elements and returns a state vector"""
+#
+#     a=oe[0]
+#     e=oe[1]
+#     i=oe[2]
+#     w=oe[3]
+#     Omega=oe[4]
+#     theta=oe[5]
+#
+#     if a<0 or e<0 or e>1 or math.fabs(1) > 2*math.pi or math.fabs(Omega)> 2*math.pi or math.fabs(w) > 2*math.pi:
+#
+#         print('Invalid orbital elements')
+#
+#     xhat = np.array([1, 0, 0])
+#     yhat = np.array([0, 0, 0])
+#     zhat = np.array([1, 0, 0])
+#
+#     r = (h**2/mu) * (1/(1+e*np.cos(theta))) * np.array([np.cos(theta), np.sin(theta), 0]).T
+#     v = mu/h*np.array([-np.sin(theta), e + np.cos(theta), 0]).T
+#
+#     nu = kepler(oe,t)
+#     nhat = math.cos(Omega)*xhat+math.sin(Omega)*yhat
+#     rhatT=-math.cos(i)*math.sin(Omega)*xhat+math.cos(i)*math.cos(Omega)*yhat+math.sin(i)*zhat
+#     rmag=a*(1-e**2)/(1+e*math.cos(nu))
+#     vmag=math.sqrt(mu/rmag*(2-rmag/a))
+#     gamma=math.atan2(e*math.sin(nu),1+e*math.cos(nu))
+#     u=w+nu
+#     rhat=math.cos(u)*nhat+math.sin(u)*rhatT
+#     vhat=math.sin(gamma-u)*nhat+math.cos(gamma-u)*rhatT
+#     r=rmag*rhat
+#     v=vmag*vhat
+#
+#     return np.array([r, v])
+#
+#
+# def diffCW():
+#
+#    """Solves the difeerential form of the CW equationsi"""
+#     a = 5000 + Re
+#     n = np.sqrt(mu / a**3)
+#
+#     t = np.linspace(0,100,100)
+#     x0 = np.array([a, 0.0, 0.0])
+#     v0 = np.array([0, n, 0])
+#
+#     y = odeint(clohessyWiltshireode, [a, .5*a, .5*a, 0.0, n, 0], t)
+#
+#     plt.figure(1)
+#     plt.plot(t, y[:,0])
+#     plt.xlabel('t')
+#     plt.ylabel('xyz')
+#     plt.show()
+#
+# def clohessy_Wiltshire_ode(x,t):
+#     """Clohessy Wilshire model differential equation"""
 #    # set up the 2nd order odes as 1st order
 #    dx=x[3]  # xdot
 #    dy=x[4]  # ydot
