@@ -129,12 +129,11 @@ def main():
         # Second CW equation deltavf
         deltavf = vr.dot(deltar0) + vv.dot(deltav0p)
 
-
         deltarv0 = np.concatenate((deltar0, deltav0p)).reshape((1, 6))
-        # deltarvf = np.concatenate((deltarf, deltavf)).reshape((1, 6))
-
+        deltarvf = np.concatenate((deltarf, deltavf)).reshape((1, 6))
+        delta = np.array([[deltarv0], [deltarvf]])
         # Save the initial and final states in the csv file to use for training
-        save_data('trainingData.csv', deltarv0)
+        save_data('trainingData.csv', delta)
 
         # Save the test data and the output test data
         save_data('testData.csv', np.reshape(deltar0, (1, 3)))
