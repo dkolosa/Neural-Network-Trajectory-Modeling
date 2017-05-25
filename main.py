@@ -13,10 +13,17 @@ def main():
 
     Re = 6378
     mu = 398600
-
-    # time of scenario (seconds)
     hr_to_sec = 60 ** 2
-    time_span = np.linspace(0, 7 * hr_to_sec, 101)
+
+    a = 300 + Re  # semi-major axis
+    n = np.sqrt(mu/a**3)   # mean motion circular orbit
+
+    tfinal = 2*np.pi/n*10
+    # time of scenario (seconds)
+
+    time_span = np.linspace(0, 6000, 1000)
+    # time_span = np.linspace(0, tfinal, 10)
+
 
 # """
 #    # Example 7.2 from Curtis
@@ -50,10 +57,10 @@ def main():
     # remove_data('trainingData.csv')
 
     # do the ode of the CW equations
-    y_CW = diffCW(time_span)
+    y_CW = diffCW(time_span, a, n)
 
     # Use the CW equations as input and output for a neural network
-    test_regression(y_CW, time_span, False)
+    # test_regression(y_CW, time_span, False)
 
     pass
 
@@ -167,57 +174,69 @@ def remove_data(file):
         pass
 
 
-def diffCW(time_span):
+def diffCW(time_span, a, n):
     """Solves the difeerential form of the CW equations
         Units: r = km, time = seconds"""
-    a = 1000 + Re   # orbit location
-    # Assuming a circular mean motion
-    n = np.sqrt(mu / a**3)
 
-    # r0 = [a, 0.0, 0.0]
-    # v0 = [0, n, 0]
-    r0 = [1622.39, 200.10, 3717.44]
-    v0 = [0, 0.492357, 2.48318]
-    y0 = r0 + v0
+    # Chaser
+    delta_r0 = [0.0, 0.0, 0.0]
+    delta_v0 = [0, -0.01, 0]
+    # delta_r0 = [1.2, 2.3, 1.26]
+    # delta_v0 = [0.31667, 0.11199, 1.247]
+    delta_y0 = delta_r0 + delta_v0
 
-    y = odeint(Clohessy_Wiltshire_ode, y0, time_span, args=(n,))
+    y_rel = odeint(CW_ode, delta_y0, time_span, args=(n,))
 
-    # xt = (4-3*np.cos(n*t))*r0[0] + (np.sin(n*t)/n)*v0[0] + (2/n)*(1-np.cos(n*t))*v0[1]
-    # yt = 6*(np.sin(n*t) - n*t)*r0[0] + r0[1]+ (2/n)*(np.cos(n*t) - 1)*v0[0] + (1/n)*(4*np.sin(n*t)-3*n*t)*v0[1]
+    # target
+    x0 = [a, 0, 0]
+    v0 = [0, np.sqrt(mu/a), 0]
+    y0 = x0 + v0
+    y_abs = odeint(two_body, y0, time_span)
+
+    xt = (4-3*np.cos(n*time_span))*delta_r0[0] + (np.sin(n*time_span)/n)*delta_v0[0] + (2/n)*(1-np.cos(n*time_span))*delta_v0[1]
+    yt = 6*(np.sin(n*time_span) - n*time_span)*delta_r0[0] + delta_r0[1]+ (2/n)*(np.cos(n*time_span) - 1)*delta_v0[0] + (1/n)*(4*np.sin(n*time_span)-3*n*time_span)*delta_v0[1]
+    # zt =
     # rtot = np.sqrt(y[:, 0]**2 + y[:, 1]**2 + y[:, 2]**2)
 
-    # plt.figure(1)
-    # plt.subplot(2, 2, 1)
-    # plt.plot(time_span / 60, y[:, 0], label='x')
-    # plt.plot(time_span/60, y[:,1], label='y')
-    # plt.plot(time_span / 60, y[:, 2], label='z')
-    # plt.xlabel('time (min)')
-    # plt.ylabel('position')
-    # plt.legend()
-    #
-    # plt.subplot(2, 2, 2)
-    # plt.plot(time_span / hr_to_sec, y[:, 3], time_span / hr_to_sec, y[:, 4], time_span / hr_to_sec, y[:, 5])
-    # plt.ylabel('velocity')
-    # plt.xlabel('time (min)')
-    #
-    # plt.subplot(2, 2, 3)
-    # plt.plot(y[:, 0], y[:, 1])
-    # plt.ylabel('y')
-    # plt.xlabel('x')
-    #
-    # plt.subplot(2, 2, 4)
-    # plt.plot(y[:, 0], y[:, 2])
-    # plt.ylabel('z')
-    # plt.xlabel('x')
-    #
-    # plt.figure(2)
-    # plt.axes(projection='3d')
-    # plt.plot(y[:, 0], y[:, 1], y[:, 2])
-    # plt.show()
+    plots(time_span, y_rel, y_abs)
 
-    return y
+    return y_rel
 
-def Clohessy_Wiltshire_ode(x, t, n):
+
+def plots(time_span, y_rel, y_abs):
+
+    plt.figure(1)
+    plt.subplot(3, 1, 1)
+    plt.plot(time_span / 60, y_rel[:, 0], label='x')
+    plt.plot(time_span / 60, y_rel[:,1], label='y')
+    plt.plot(time_span / 60, y_rel[:, 2], label='z')
+    plt.xlabel('time')
+    plt.ylabel('position')
+    plt.legend()
+
+    plt.subplot(3, 1, 2)
+    plt.plot(y_rel[:, 0], y_rel[:, 1])
+    plt.ylabel('y')
+    plt.xlabel('x')
+
+    plt.subplot(3, 1, 3)
+    plt.plot(y_rel[:, 0], y_rel[:, 2])
+    plt.ylabel('z')
+    plt.xlabel('x')
+
+    plt.figure(2)
+    plt.axes(projection='3d')
+    plt.plot(y_rel[:, 0], y_rel[:, 1], y_rel[:, 2])
+
+    plt.figure(3)
+    plt.axes(projection='3d')
+    plt.plot(y_abs[:,0], y_abs[:,1], y_abs[:,2])
+    plt.title('two boundary')
+
+    plt.show()
+
+
+def CW_ode(x, t, n):
     """Clohessy Wilshire model differential equation in terms of the moving frame (CW frame LVLH)"""
     # set up the 2nd order odes as 1st order
     dx = x[3]  # xdot
@@ -225,20 +244,43 @@ def Clohessy_Wiltshire_ode(x, t, n):
     dz = x[5]  # zdot
 
     ddx = 3 * (n ** 2) * x[0] + 2 * n * dy
-    ddy = -2 * n * dx
-    ddz = -n ** 2 * x[2]
+    ddz = -2 * n * dx
+    ddy = -n ** 2 * x[2]
 
     return [dx, dy, dz, ddx, ddy, ddz]
 
 
-def test_regression(y_CW, X, plots=False):
+def two_body(y, t):
+    rx, ry, rz = y[0], y[1], y[2]
+    vx, vy, vz = y[3], y[4], y[5]
+
+    r = np.array([rx, ry, rz])
+    v = np.array([vx, vy, vz])
+
+    r_mag = np.linalg.norm(r)
+    c = -mu / (r_mag ** 3)
+
+    dy = np.zeros(6)
+
+    dy[0] = y[3]
+    dy[1] = y[4]
+    dy[2] = y[5]
+    dy[3] = c*y[0]
+    dy[4] = c*y[1]
+    dy[5] = c*y[2]
+
+    return dy
+
+
+def test_regression(y_CW, X, plots=True):
     """ Creates a neural network to model the output of a desired function"""
     #First create the data.
     # n = 100   # Number of points
     # t = np.linspace(0, 2*np.pi, num=n)  # Function range (time span)
     # t.shape = (n, 1)
-    # y_org = np.sin(X)
-    y = y_CW[:,0].flatten()
+    # y_org = np.sin(t)
+    X.shape = (-1, 1)
+    y = y_CW[:,0] / 10000   # Normalized by 10000
 
     #We make a neural net with 2 hidden layers, 20 neurons in each, using logistic activation
     #functions.

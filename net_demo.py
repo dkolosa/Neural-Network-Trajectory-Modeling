@@ -52,7 +52,6 @@ class NeuralNetwork(object):
         """Propagates the input from the input layer to the output layer.
         """
         k=len(x)
-        # k = np.len(x)
         x.shape=(k,1)
         self.inputs[0]=x
         self.outputs[0]=x
@@ -107,7 +106,7 @@ def logistic(x):
 
 
 def logistic_prime(x):
-    ex=np.exp(-x)
+    ex = np.exp(-x)
     return ex/(1+ex)**2
 
 
