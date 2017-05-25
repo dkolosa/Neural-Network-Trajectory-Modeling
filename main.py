@@ -4,15 +4,20 @@ import numpy as np
 from scipy.integrate import odeint
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-
+from net_demo import *
 
 def main():
     """Solving the linear CW equations given a set of state vectors
        for a target and chaser vehicle"""
-    global mu, Re
+    global mu, Re, hr_to_sec
 
     Re = 6378
     mu = 398600
+
+    # time of scenario (seconds)
+    hr_to_sec = 60 ** 2
+    time_span = np.linspace(0, 7 * hr_to_sec, 101)
+
 # """
 #    # Example 7.2 from Curtis
 #
@@ -45,12 +50,16 @@ def main():
     # remove_data('trainingData.csv')
 
     # do the ode of the CW equations
-    diffCW()
+    y_CW = diffCW(time_span)
+
+    # Use the CW equations as input and output for a neural network
+    test_regression(y_CW, time_span, False)
+
     pass
 
 
 # generate a random set of chaser and target values
-def cw_LInear():
+def cw_Linear():
     for x in range(20):
         # Space Station
         r0random = np.random.uniform(low=10, high=50.0, size=3)
@@ -158,89 +167,58 @@ def remove_data(file):
         pass
 
 
-# def oe_to_rv(oe):
-
-#     """Input a set of orbital elements and returns a state vector
-#         Inputs: numpy array
-#                 a, e, i, w, Omega, theta
-#         Outputs:
-#                 [x, y, z, v_x, v_y, v_z] 
-
-#     """
-
-#     a, e, i ,w, Omega, theta = oe[0], oe[1], oe[2], oe[3], oe[4], oe[5]
-
-
-#     if a < 0 or e < 0 or e > 1 or np.fabs(1) > 2*np.pi or np.fabs(Omega)> 2*np.pi or np.fabs(w) > 2*np.pi:
-#         raise ValueError("error: Invalid orbital elements")
-
-#     xhat = np.array([1, 0, 0])
-#     yhat = np.array([0, 0, 0])
-#     zhat = np.array([1, 0, 0])
-
-#     r = (h**2/mu) * (1/(1+e*np.cos(theta))) * np.array([np.cos(theta), np.sin(theta), 0]).T
-#     v = mu/h*np.array([-np.sin(theta), e + np.cos(theta), 0]).T
-
-#     nu = kepler(oe,t)
-#     nhat = np.cos(Omega)*xhat+np.sin(Omega)*yhat
-#     rhatT=-np.cos(i)*np.sin(Omega)*xhat+np.cos(i)*np.cos(Omega)*yhat+np.sin(i)*zhat
-#     rmag=a*(1-e**2)/(1+e*np.cos(nu))
-#     vmag=np.sqrt(mu/rmag*(2-rmag/a))
-#     gamma=np.atan2(e*np.sin(nu),1+e*np.cos(nu))
-#     u=w+nu
-#     rhat=np.cos(u)*nhat+np.sin(u)*rhatT
-#     vhat=np.sin(gamma-u)*nhat+np.cos(gamma-u)*rhatT
-#     r=rmag*rhat
-#     v=vmag*vhat
-
-#     return np.array([r, v])
-
-
-def diffCW():
-    """Solves the difeerential form of the CW equations"""
-    a = 5200 + Re
-    hr_to_sec = 60 ** 2
+def diffCW(time_span):
+    """Solves the difeerential form of the CW equations
+        Units: r = km, time = seconds"""
+    a = 1000 + Re   # orbit location
     # Assuming a circular mean motion
     n = np.sqrt(mu / a**3)
 
-    # t in seconds
-    t = np.linspace(0, 20 * hr_to_sec, 101)
     # r0 = [a, 0.0, 0.0]
     # v0 = [0, n, 0]
-    r0 = [1622.39, 5305.10, 3717.44]
-    v0 = [-7.29977, 0.492357, 2.48318]
+    r0 = [1622.39, 200.10, 3717.44]
+    v0 = [0, 0.492357, 2.48318]
     y0 = r0 + v0
-    # print(y0)
 
-    # y = odeint(clohessy_Wiltshire_ode, [a, .5*a, .5*a, 0.0, n, 0], t, args=n)
-    y = odeint(Clohessy_Wiltshire_ode, y0, t, args=(n,))
-    print(y[0, :])
-    plt.figure(1)
-    plt.subplot(2, 2, 1)
-    plt.plot(t / hr_to_sec * 60, y[:, 0], t / hr_to_sec * 60, y[:, 1], t / hr_to_sec * 60, y[:, 2])
-    plt.xlabel('time (min)')
-    plt.ylabel('position')
-    plt.legend()
+    y = odeint(Clohessy_Wiltshire_ode, y0, time_span, args=(n,))
 
-    plt.subplot(2, 2, 2)
-    plt.plot(t / hr_to_sec, y[:, 3], t / hr_to_sec, y[:, 4], t / hr_to_sec, y[:, 5])
-    plt.ylabel('velocity')
-    plt.xlabel('time (min)')
+    # xt = (4-3*np.cos(n*t))*r0[0] + (np.sin(n*t)/n)*v0[0] + (2/n)*(1-np.cos(n*t))*v0[1]
+    # yt = 6*(np.sin(n*t) - n*t)*r0[0] + r0[1]+ (2/n)*(np.cos(n*t) - 1)*v0[0] + (1/n)*(4*np.sin(n*t)-3*n*t)*v0[1]
+    # rtot = np.sqrt(y[:, 0]**2 + y[:, 1]**2 + y[:, 2]**2)
 
-    plt.subplot(2, 2, 3)
-    plt.plot(y[:, 0], y[:, 1])
-    plt.ylabel('y')
-    plt.xlabel('x')
+    # plt.figure(1)
+    # plt.subplot(2, 2, 1)
+    # plt.plot(time_span / 60, y[:, 0], label='x')
+    # plt.plot(time_span/60, y[:,1], label='y')
+    # plt.plot(time_span / 60, y[:, 2], label='z')
+    # plt.xlabel('time (min)')
+    # plt.ylabel('position')
+    # plt.legend()
+    #
+    # plt.subplot(2, 2, 2)
+    # plt.plot(time_span / hr_to_sec, y[:, 3], time_span / hr_to_sec, y[:, 4], time_span / hr_to_sec, y[:, 5])
+    # plt.ylabel('velocity')
+    # plt.xlabel('time (min)')
+    #
+    # plt.subplot(2, 2, 3)
+    # plt.plot(y[:, 0], y[:, 1])
+    # plt.ylabel('y')
+    # plt.xlabel('x')
+    #
+    # plt.subplot(2, 2, 4)
+    # plt.plot(y[:, 0], y[:, 2])
+    # plt.ylabel('z')
+    # plt.xlabel('x')
+    #
+    # plt.figure(2)
+    # plt.axes(projection='3d')
+    # plt.plot(y[:, 0], y[:, 1], y[:, 2])
+    # plt.show()
 
-    plt.figure(2)
-    plt.axes(projection='3d')
-    plt.plot(y[:, 0], y[:, 1], y[:, 2])
-    plt.plot(y[:, 3], y[:, 4], y[:, 5])
-    plt.show()
-
+    return y
 
 def Clohessy_Wiltshire_ode(x, t, n):
-    """Clohessy Wilshire model differential equation"""
+    """Clohessy Wilshire model differential equation in terms of the moving frame (CW frame LVLH)"""
     # set up the 2nd order odes as 1st order
     dx = x[3]  # xdot
     dy = x[4]  # ydot
@@ -250,9 +228,37 @@ def Clohessy_Wiltshire_ode(x, t, n):
     ddy = -2 * n * dx
     ddz = -n ** 2 * x[2]
 
-    # print(x)
+    return [dx, dy, dz, ddx, ddy, ddz]
 
-    return np.array([dx, dy, dz, ddx, ddy, ddz])
+
+def test_regression(y_CW, X, plots=False):
+    """ Creates a neural network to model the output of a desired function"""
+    #First create the data.
+    # n = 100   # Number of points
+    # t = np.linspace(0, 2*np.pi, num=n)  # Function range (time span)
+    # t.shape = (n, 1)
+    # y_org = np.sin(X)
+    y = y_CW[:,0].flatten()
+
+    #We make a neural net with 2 hidden layers, 20 neurons in each, using logistic activation
+    #functions.
+    # param=((1,0,0),(10, expit, logistic_prime),(10, expit, logistic_prime),(1,identity, identity_prime))
+    param = ((1, 0, 0), (20, logistic, logistic_prime), (1, identity, identity_prime))
+
+    #Set learning rate.
+    rates = [0.1]
+    predictions=[]
+    for rate in rates:
+        N=NeuralNetwork(X,y,param)
+        N.train(100, learning_rate=rate)
+        predictions.append([rate, N.predict(X)])
+    fig, ax = plt.subplots(1, 1)
+    if plots:
+        ax.plot(X, y, label='Sine', linewidth=2, color='black')
+        for data in predictions:
+            ax.plot(X, data[1], label="Learning Rate: "+str(data[0]))
+        ax.legend()
+    plt.show()
 
 
 if __name__ == '__main__':
