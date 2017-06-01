@@ -18,11 +18,9 @@ def main():
     a = 300 + Re  # semi-major axis
     n = np.sqrt(mu/a**3)   # mean motion circular orbit
 
-    tfinal = 2*np.pi/n*10
-    # time of scenario (seconds)
+    tfinal = 2*np.pi/n*5
 
-    time_span = np.linspace(0, 6000, 1000)
-    # time_span = np.linspace(0, tfinal, 10)
+    time_span = np.arange(0, tfinal, 100)
 
 
 # """
@@ -57,10 +55,11 @@ def main():
     # remove_data('trainingData.csv')
 
     # do the ode of the CW equations
+
     y_CW = diffCW(time_span, a, n)
 
     # Use the CW equations as input and output for a neural network
-    # test_regression(y_CW, time_span, False)
+    test_regression(y_CW, time_span, False)
 
     pass
 
@@ -175,8 +174,22 @@ def remove_data(file):
 
 
 def diffCW(time_span, a, n):
-    """Solves the difeerential form of the CW equations
-        Units: r = km, time = seconds"""
+    """
+    Solves the difeerential form of the CW equations
+
+    Arguments:
+            time_span: time span of interest
+            a : semi-major axis
+            n : mean motion
+
+    Units:
+        r = km
+        time = seconds
+    """
+
+    # ode parameters
+    abserr = 1.0e-8
+    relerr = 1.0e-6
 
     # Chaser
     delta_r0 = [0.0, 0.0, 0.0]
@@ -185,43 +198,41 @@ def diffCW(time_span, a, n):
     # delta_v0 = [0.31667, 0.11199, 1.247]
     delta_y0 = delta_r0 + delta_v0
 
-    y_rel = odeint(CW_ode, delta_y0, time_span, args=(n,))
+    y_rel = odeint(CW_ode, delta_y0, time_span, args=(n,),
+                   atol=abserr, rtol=relerr)
 
     # target
     x0 = [a, 0, 0]
     v0 = [0, np.sqrt(mu/a), 0]
     y0 = x0 + v0
-    y_abs = odeint(two_body, y0, time_span)
+    y_abs = odeint(two_body, y0, time_span,
+                   atol=abserr, rtol=relerr)
 
-    xt = (4-3*np.cos(n*time_span))*delta_r0[0] + (np.sin(n*time_span)/n)*delta_v0[0] + (2/n)*(1-np.cos(n*time_span))*delta_v0[1]
-    yt = 6*(np.sin(n*time_span) - n*time_span)*delta_r0[0] + delta_r0[1]+ (2/n)*(np.cos(n*time_span) - 1)*delta_v0[0] + (1/n)*(4*np.sin(n*time_span)-3*n*time_span)*delta_v0[1]
-    # zt =
-    # rtot = np.sqrt(y[:, 0]**2 + y[:, 1]**2 + y[:, 2]**2)
-
-    plots(time_span, y_rel, y_abs)
+    # plots(time_span, y_rel, y_abs)
 
     return y_rel
 
 
 def plots(time_span, y_rel, y_abs):
-
+    """
+    Generates a set of plots for the CW equations
+    :param time_span: time duration of interest
+    :param y_rel: output of the CW equations
+    :param y_abs: output of the two body problem
+    :return: null
+    """
     plt.figure(1)
     plt.subplot(3, 1, 1)
-    plt.plot(time_span / 60, y_rel[:, 0], label='x')
-    plt.plot(time_span / 60, y_rel[:,1], label='y')
-    plt.plot(time_span / 60, y_rel[:, 2], label='z')
-    plt.xlabel('time')
+    plt.plot(time_span, y_rel[:, 0], label='x')
+    plt.plot(time_span, y_rel[:, 1], label='y')
+    plt.plot(time_span, y_rel[:, 2], label='z')
+    plt.xlabel('time (s)')
     plt.ylabel('position')
     plt.legend()
 
     plt.subplot(3, 1, 2)
     plt.plot(y_rel[:, 0], y_rel[:, 1])
     plt.ylabel('y')
-    plt.xlabel('x')
-
-    plt.subplot(3, 1, 3)
-    plt.plot(y_rel[:, 0], y_rel[:, 2])
-    plt.ylabel('z')
     plt.xlabel('x')
 
     plt.figure(2)
@@ -236,21 +247,69 @@ def plots(time_span, y_rel, y_abs):
     plt.show()
 
 
-def CW_ode(x, t, n):
-    """Clohessy Wilshire model differential equation in terms of the moving frame (CW frame LVLH)"""
-    # set up the 2nd order odes as 1st order
-    dx = x[3]  # xdot
-    dy = x[4]  # ydot
-    dz = x[5]  # zdot
+def cw_cloed_form(time_span, n, delta_r0, delta_v0):
+    """
+        Computes the closed form solution of the CW equations in the LVLH frame
 
-    ddx = 3 * (n ** 2) * x[0] + 2 * n * dy
-    ddz = -2 * n * dx
-    ddy = -n ** 2 * x[2]
+        Arguments:
+            time_span : time_span of the orbit
+            n : mean motion
+            delta_r0 : Initial conditions of position
+                delta_r0 = [x, y, z]
+            delta_v0 : initial conditions of velocity
+                delta_v0 = [u, v, w]
+    """
+
+    xt = (4-3*np.cos(n*time_span))*delta_r0[0] + (np.sin(n*time_span)/n)*delta_v0[0] + (2/n)*(1-np.cos(n*time_span))*delta_v0[1]
+    yt = 6*(np.sin(n*time_span) - n*time_span)*delta_r0[0] + delta_r0[1]+ (2/n)*(np.cos(n*time_span) - 1)*delta_v0[0] + (1/n)*(4*np.sin(n*time_span)-3*n*time_span)*delta_v0[1]
+    zt = np.cos(n*time_span)*delta_r0[2] + (1/n)*np.sin(n*time_span)*delta_v0[2]
+    ut = 3*n*np.sin(n*time_span)*delta_r0[0] + np.cos(n*time_span)*delta_v0[0] + 2*np.sin(n*time_span)*delta_v0[1]
+    vt = 6*n*(np.cos(n*time_span) - 1)*delta_r0[0] - 2*np.sin(n*time_span)*delta_v0[0] + (4*np.cos(n*time_span) - 3)*delta_v0[1]
+    wt = -n*np.sin(n*time_span)*delta_r0[2] + np.cos(n*time_span)*delta_v0[2]
+
+    y_rel = np.column_stack((xt, yt, zt))
+    plt.figure()
+    plt.subplot(3,1,1)
+    plt.plot(time_span, xt, label='x')
+    plt.plot(time_span, yt, label='y')
+    plt.plot(time_span, zt, label='z')
+
+    plt.subplot(3,1,2)
+    plt.plot(time_span, ut, label='u')
+    plt.plot(time_span, vt, label='v')
+    plt.plot(time_span, wt, label='w')
+
+    plt.show()
+    return y_rel
+
+
+def CW_ode(w, t, n):
+    """
+    Defines the differential equation in terms of the moving frame (CW frame LVLH)
+    Arguments:
+        w : vector of state variables
+            w = [x,y,z,dx,dy,dz]
+        t : time
+        n : mean motion
+    """
+
+    x, y, z, dx, dy, dz = w
+
+    ddx = 3*(n ** 2)*x + 2*n*dy
+    ddy = -2*n*dx
+    ddz = -n**2*z
 
     return [dx, dy, dz, ddx, ddy, ddz]
 
 
 def two_body(y, t):
+    """
+    Solves the two body problem
+    :param y: state vector
+        y = [rx,ry,rz,vx,vy,vz]
+    :param t: time
+    :return: dy
+    """
     rx, ry, rz = y[0], y[1], y[2]
     vx, vy, vz = y[3], y[4], y[5]
 
@@ -273,19 +332,26 @@ def two_body(y, t):
 
 
 def test_regression(y_CW, X, plots=True):
-    """ Creates a neural network to model the output of a desired function"""
+    """
+    Creates, trains, and tests a neural network
+    :param y_CW: the input dataset
+    :param X: time span of the dataset
+    :param plots: generate the plots of training and test data
+    :return: null
+    """
     #First create the data.
     # n = 100   # Number of points
     # t = np.linspace(0, 2*np.pi, num=n)  # Function range (time span)
     # t.shape = (n, 1)
     # y_org = np.sin(t)
+    X = X/ (60**2)
     X.shape = (-1, 1)
-    y = y_CW[:,0] / 10000   # Normalized by 10000
+    y = y_CW[:,0]   # Normalized by 10000
 
     #We make a neural net with 2 hidden layers, 20 neurons in each, using logistic activation
     #functions.
     # param=((1,0,0),(10, expit, logistic_prime),(10, expit, logistic_prime),(1,identity, identity_prime))
-    param = ((1, 0, 0), (20, logistic, logistic_prime), (1, identity, identity_prime))
+    param = ((1, 0, 0), (20, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
 
     #Set learning rate.
     rates = [0.1]

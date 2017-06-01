@@ -123,4 +123,4 @@ def hyp_tan(x):
 
 
 def hyp_tan_prime(x):
-    return 1 - (hyp_tan(x ** 2))
+    return (4*np.exp(-2*x)) / (np.exp(-2*x)+1)**2
