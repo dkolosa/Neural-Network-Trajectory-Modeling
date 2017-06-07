@@ -5,6 +5,7 @@ from scipy.integrate import odeint
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from net_demo import *
+from sklearn.preprocessing import MinMaxScaler
 
 def main():
     """Solving the linear CW equations given a set of state vectors
@@ -18,9 +19,9 @@ def main():
     a = 300 + Re  # semi-major axis
     n = np.sqrt(mu/a**3)   # mean motion circular orbit
 
-    tfinal = 2*np.pi/n*5
+    tfinal = 2*np.pi/n*6
 
-    time_span = np.arange(0, tfinal, 100)
+    time_span = np.arange(0, tfinal, 10)
 
 
 # """
@@ -59,7 +60,7 @@ def main():
     y_CW = diffCW(time_span, a, n)
 
     # Use the CW equations as input and output for a neural network
-    test_regression(y_CW, time_span, False)
+    test_regression(y_CW, time_span, True)
 
     pass
 
@@ -346,15 +347,18 @@ def test_regression(y_CW, X, plots=True):
     # y_org = np.sin(t)
     X = X/ (60**2)
     X.shape = (-1, 1)
-    y = y_CW[:,0]   # Normalized by 10000
+
+    y = y_CW[:,0]
+    y = 2*((y-y.min())/(y.max()-y.min()))-1
+
 
     #We make a neural net with 2 hidden layers, 20 neurons in each, using logistic activation
     #functions.
     # param=((1,0,0),(10, expit, logistic_prime),(10, expit, logistic_prime),(1,identity, identity_prime))
-    param = ((1, 0, 0), (20, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
+    param = ((1, 0, 0), (50, hyp_tan, hyp_tan_prime), (50, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
 
     #Set learning rate.
-    rates = [0.1]
+    rates = [0.01]
     predictions=[]
     for rate in rates:
         N=NeuralNetwork(X,y,param)
@@ -366,7 +370,7 @@ def test_regression(y_CW, X, plots=True):
         for data in predictions:
             ax.plot(X, data[1], label="Learning Rate: "+str(data[0]))
         ax.legend()
-    plt.show()
+        plt.show()
 
 
 if __name__ == '__main__':

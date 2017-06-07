@@ -119,8 +119,8 @@ def identity_prime(x):
 
 
 def hyp_tan(x):
-    return (2/(1+np.exp(-2*x))) - 1
+    return np.tanh(x)
 
 
 def hyp_tan_prime(x):
-    return (4*np.exp(-2*x)) / (np.exp(-2*x)+1)**2
+    return 1 - np.tanh(x)**2
