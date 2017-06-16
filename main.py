@@ -19,7 +19,7 @@ def main():
     a = 300 + Re  # semi-major axis
     n = np.sqrt(mu/a**3)   # mean motion circular orbit
 
-    tfinal = 2*np.pi/n*6
+    tfinal = 2*np.pi/n*2
 
     time_span = np.arange(0, tfinal, 10)
 
@@ -347,23 +347,25 @@ def test_regression(y_CW, X, plots=True):
     # y_org = np.sin(t)
     X = X/ (60**2)
     X.shape = (-1, 1)
-
+    x0 = np.ones(len(X)) * 1
+    x0.shape = (-1,1)
+    in_data = np.hstack((X, x0))
     y = y_CW[:,0]
-    y = 2*((y-y.min())/(y.max()-y.min()))-1
+    # X = 2*((X-X.min())/(X.max()-X.min()))-1
 
 
     #We make a neural net with 2 hidden layers, 20 neurons in each, using logistic activation
     #functions.
     # param=((1,0,0),(10, expit, logistic_prime),(10, expit, logistic_prime),(1,identity, identity_prime))
-    param = ((1, 0, 0), (50, hyp_tan, hyp_tan_prime), (50, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
+    param = ((2, 0, 0), (15, hyp_tan, hyp_tan_prime), (15, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
 
     #Set learning rate.
-    rates = [0.01]
+    rates = [0.001]
     predictions=[]
     for rate in rates:
-        N=NeuralNetwork(X,y,param)
+        N=NeuralNetwork(in_data,y,param)
         N.train(100, learning_rate=rate)
-        predictions.append([rate, N.predict(X)])
+        predictions.append([rate, N.predict(in_data)])
     fig, ax = plt.subplots(1, 1)
     if plots:
         ax.plot(X, y, label='Sine', linewidth=2, color='black')
