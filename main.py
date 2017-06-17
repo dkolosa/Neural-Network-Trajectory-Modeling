@@ -10,16 +10,17 @@ from net_demo import *
 Re = 6378
 mu = 398600
 hr_to_sec = 60 ** 2
+a = 300 + Re  # semi-major axis
+n = np.sqrt(mu / a ** 3)  # mean motion circular orbit
 
 def main():
     """Solving the linear CW equations given a set of state vectors
        for a target and chaser vehicle"""
 
-    a = 300 + Re  # semi-major axis
-    n = np.sqrt(mu/a**3)   # mean motion circular orbit
+
     delta_r0 = [[0.0, 0.0, 0.0], [.80, 0.0, 0.0], [0.10, 0.0, 0.0], [0.60, 0.0, 0.0], [0.94, 0, 0]]
     delta_r0_std = np.asarray(delta_r0)
-
+    r_test = [0.51, 0.0, 0.0]
     tfinal = 2*np.pi/n*2
     time_span = np.arange(0, tfinal, 10)
 
@@ -65,7 +66,9 @@ def main():
         x_CW[:,i] = y_CW[:,0]
         i += 1
 
-    test_regression(x_CW, delta_r0, time_span, True)
+    y_test_CW = diffCW(time_span, a, n, r_test)
+    y_test = y_test_CW[:,0]
+    test_regression(x_CW, delta_r0, time_span, y_test, plots=True)
 
     # Use the CW equations as input and output for a neural network
     # test_regression(x_CW, delta_r0, time_span, True)
@@ -340,12 +343,13 @@ def two_body(y, t):
     return dy
 
 
-def test_regression(x_CW, delta_r0, X, plots=False):
+def test_regression(x_CW, delta_r0, X, y_test, plots=False):
     """
     Creates, trains, and tests a neural network
     :param x_CW: the output dataset (used for training)
     :param delta_r0: initial conditions of the training set
     :param X: time span of the dataset (input)
+    :param y_test: the test data of the CW equation
     :param plots: generate the plots of training and test data
     :return: null
     """
@@ -362,9 +366,9 @@ def test_regression(x_CW, delta_r0, X, plots=False):
     y = x_CW
     x0 = np.ones((len(X), len(delta_r0)))
 
-    # if test_set:
-    #     x0_test = np.ones(len(X)) * 0.23
-    #     test_data = np.hstack(X, x0_test)
+    x0_test = np.ones(len(X)) * 0.51
+    x0_test.shape = (-1,1)
+    test_set = np.hstack((X, x0_test))
 
     # make a neural net with 2 hidden layers, 20 neurons in each, using hyperbolic tan activation
     # functions.
@@ -392,15 +396,15 @@ def test_regression(x_CW, delta_r0, X, plots=False):
             print("Training Duration: ", end_train-start_train, "\n initial cond: ", r0[0])
             j += 1
 
-    # predictions.append(rates, N.predict(train)])
+    predictions.append([rates, N.predict(test_set)])
 
     # plt.figure(4)
     if plots:
         fig, ax = plt.subplots(1, 1)
-        ax.plot(X, y, label='True value', linewidth=2, color='black')
+        ax.plot(X, y_test, label='True value', linewidth=2, color='black')
         for data in predictions:
             # y = np.array(predictions)
-            ax.plot(X, data[1], label="Learning Rate: "+str(data[0]))
+            ax.plot(X, data[1], label="Learning Rate: "+str(0.51))
         ax.legend()
         plt.show()
 
