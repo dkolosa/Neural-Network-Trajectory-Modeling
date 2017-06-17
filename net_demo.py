@@ -1,38 +1,38 @@
 import numpy as np
-import matplotlib.pyplot as plt
-
 
 class NeuralNetwork(object):
     def __init__(self, X, y, parameters):
-        #Input data
+        # Input data
         self.X=X
-        #Output data
+        # Output data
         self.y=y
-        #Expect parameters to be a tuple of the form:
+        # Expect parameters to be a tuple of the form:
         #    ((n_input,0,0), (n_hidden_layer_1, f_1, f_1'), ...,
         #     (n_hidden_layer_k, f_k, f_k'), (n_output, f_o, f_o'))
         self.n_layers = len(parameters)
-        #Counts number of neurons without bias neurons in each layer.
+        # Counts number of neurons without bias neurons in each layer.
         self.sizes = [layer[0] for layer in parameters]
-        #Activation functions for each layer.
+        # Activation functions for each layer.
         self.fs =[layer[1] for layer in parameters]
-        #Derivatives of activation functions for each layer.
+        # Derivatives of activation functions for each layer.
         self.fprimes = [layer[2] for layer in parameters]
         self.build_network()
 
     def build_network(self):
-        """ Builds the neural network by initializing all the wegiths"""
-        #List of weight matrices taking the output of one layer to the input of the next.
+        """
+        Builds the neural network by initializing all the weights
+        """
+        # List of weight matrices taking the output of one layer to the input of the next.
         self.weights=[]
-        #Bias vector for each layer.
+        # Bias vector for each layer.
         self.biases=[]
-        #Input vector for each layer.
+        # Input vector for each layer.
         self.inputs=[]
-        #Output vector for each layer.
+        # Output vector for each layer.
         self.outputs=[]
-        #Vector of errors at each layer.
+        # Vector of errors at each layer.
         self.errors=[]
-        #We initialise the weights randomly, and fill the other vectors with 1s.
+        # We initialise the weights randomly, and fill the other vectors with 1s.
         for layer in range(self.n_layers-1):
             n = self.sizes[layer]
             m = self.sizes[layer+1]
@@ -42,14 +42,15 @@ class NeuralNetwork(object):
             self.inputs.append(np.zeros((n, 1)))
             self.outputs.append(np.zeros((n, 1)))
             self.errors.append(np.zeros((n, 1)))
-        #There are only n-1 weight matrices, so we do the last case separately.
+        # There are only n-1 weight matrices, so we do the last case separately.
         n = self.sizes[-1]
         self.inputs.append(np.zeros((n, 1)))
         self.outputs.append(np.zeros((n, 1)))
         self.errors.append(np.zeros((n, 1)))
 
     def feedforward(self, x):
-        """Propagates the input from the input layer to the output layer.
+        """
+        Propagates the input from the input layer to the output layer.
         """
         k=len(x)
         x.shape=(k,1)
@@ -61,7 +62,8 @@ class NeuralNetwork(object):
         return self.outputs[-1]
 
     def update_weights(self,x,y):
-        """Update the weight matrices for each layer based on a single input x and target y.
+        """
+        Update the weight matrices for each layer based on a single input x and target y.
         """
         output = self.feedforward(x)
         self.errors[-1]=self.fprimes[-1](self.outputs[-1])*(output-y)
@@ -74,14 +76,14 @@ class NeuralNetwork(object):
         self.weights[0] = self.weights[0]-self.learning_rate*np.outer(self.errors[1],self.outputs[0])
         self.biases[0] = self.biases[0] - self.learning_rate*self.errors[1]
 
-    def train(self, n_iter, learning_rate=1):
+    def train(self, n_iter, x, y, learning_rate=1):
         """Train the network, Updates the weights after comparing each input in X with y
         repeat this process n_iter times."""
 
         self.learning_rate=learning_rate
         n=self.X.shape[0]
         for repeat in range(n_iter):
-            #We shuffle the order in which we go through the inputs on each iter.
+            # We shuffle the order in which we go through the inputs on each iter.
             index=list(range(n))
             np.random.shuffle(index)
             for row in index:
@@ -119,8 +121,8 @@ def identity_prime(x):
 
 
 def hyp_tan(x):
-    return (2/(1+np.exp(-2*x))) - 1
+    return np.tanh(x)
 
 
 def hyp_tan_prime(x):
-    return (4*np.exp(-2*x)) / (np.exp(-2*x)+1)**2
+    return 1.0 - np.tanh(x)**2

@@ -4,25 +4,27 @@ import numpy as np
 from scipy.integrate import odeint
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+import time
 from net_demo import *
+
+Re = 6378
+mu = 398600
+hr_to_sec = 60 ** 2
 
 def main():
     """Solving the linear CW equations given a set of state vectors
        for a target and chaser vehicle"""
-    global mu, Re, hr_to_sec
-
-    Re = 6378
-    mu = 398600
-    hr_to_sec = 60 ** 2
 
     a = 300 + Re  # semi-major axis
     n = np.sqrt(mu/a**3)   # mean motion circular orbit
+    delta_r0 = [[0.0, 0.0, 0.0], [.80, 0.0, 0.0], [0.10, 0.0, 0.0], [0.60, 0.0, 0.0], [0.94, 0, 0]]
+    delta_r0_std = np.asarray(delta_r0)
 
-    tfinal = 2*np.pi/n*5
+    tfinal = 2*np.pi/n*2
+    time_span = np.arange(0, tfinal, 10)
 
-    time_span = np.arange(0, tfinal, 100)
-
-
+    x_CW = np.zeros((len(time_span), len(delta_r0)))
+    i = 0
 # """
 #    # Example 7.2 from Curtis
 #
@@ -55,11 +57,18 @@ def main():
     # remove_data('trainingData.csv')
 
     # do the ode of the CW equations
+    for r0 in delta_r0:
+        startCW = time.time()
+        y_CW = diffCW(time_span, a, n, r0)
+        stopCW = time.time()
+        print('Cw dynamics duration:', stopCW-startCW)
+        x_CW[:,i] = y_CW[:,0]
+        i += 1
 
-    y_CW = diffCW(time_span, a, n)
+    test_regression(x_CW, delta_r0, time_span, True)
 
     # Use the CW equations as input and output for a neural network
-    test_regression(y_CW, time_span, False)
+    # test_regression(x_CW, delta_r0, time_span, True)
 
     pass
 
@@ -173,7 +182,7 @@ def remove_data(file):
         pass
 
 
-def diffCW(time_span, a, n):
+def diffCW(time_span, a, n, delta_r0):
     """
     Solves the difeerential form of the CW equations
 
@@ -192,7 +201,7 @@ def diffCW(time_span, a, n):
     relerr = 1.0e-6
 
     # Chaser
-    delta_r0 = [0.0, 0.0, 0.0]
+    # delta_r0 = [0.0, 0.0, 0.0]
     delta_v0 = [0, -0.01, 0]
     # delta_r0 = [1.2, 2.3, 1.26]
     # delta_v0 = [0.31667, 0.11199, 1.247]
@@ -208,7 +217,7 @@ def diffCW(time_span, a, n):
     y_abs = odeint(two_body, y0, time_span,
                    atol=abserr, rtol=relerr)
 
-    # plots(time_span, y_rel, y_abs)
+    #plots(time_span, y_rel, y_abs)
 
     return y_rel
 
@@ -331,42 +340,69 @@ def two_body(y, t):
     return dy
 
 
-def test_regression(y_CW, X, plots=True):
+def test_regression(x_CW, delta_r0, X, plots=False):
     """
     Creates, trains, and tests a neural network
-    :param y_CW: the input dataset
-    :param X: time span of the dataset
+    :param x_CW: the output dataset (used for training)
+    :param delta_r0: initial conditions of the training set
+    :param X: time span of the dataset (input)
     :param plots: generate the plots of training and test data
     :return: null
     """
-    #First create the data.
-    # n = 100   # Number of points
-    # t = np.linspace(0, 2*np.pi, num=n)  # Function range (time span)
-    # t.shape = (n, 1)
-    # y_org = np.sin(t)
-    X = X/ (60**2)
-    X.shape = (-1, 1)
-    y = y_CW[:,0]   # Normalized by 10000
+    # create the data.
+    # n = 500   # Number of points
+    # X = np.linspace(0, 2*np.pi, num=n)  # Function range (time span)
+    # X.shape = (n, 1)
+    # y = np.sin(X)
 
-    #We make a neural net with 2 hidden layers, 20 neurons in each, using logistic activation
-    #functions.
+    # Process training data for neural network
+    X = X / (60**2)
+    X.shape = (-1, 1)
+    i = 0
+    y = x_CW
+    x0 = np.ones((len(X), len(delta_r0)))
+
+    # if test_set:
+    #     x0_test = np.ones(len(X)) * 0.23
+    #     test_data = np.hstack(X, x0_test)
+
+    # make a neural net with 2 hidden layers, 20 neurons in each, using hyperbolic tan activation
+    # functions.
     # param=((1,0,0),(10, expit, logistic_prime),(10, expit, logistic_prime),(1,identity, identity_prime))
-    param = ((1, 0, 0), (20, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
+    # param = ((1, 0, 0), (40, hyp_tan, hyp_tan_prime), (40, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
+    param = ((2, 0, 0), (40, hyp_tan, hyp_tan_prime), (40, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
 
     #Set learning rate.
-    rates = [0.1]
+    rates = [0.001]
     predictions=[]
+    j=0
     for rate in rates:
-        N=NeuralNetwork(X,y,param)
-        N.train(100, learning_rate=rate)
-        predictions.append([rate, N.predict(X)])
-    fig, ax = plt.subplots(1, 1)
+        for r0 in delta_r0:
+            train_input = x0[:, j] * r0[0]
+            train_input.shape = (-1,1)
+            train = np.hstack((X, train_input))
+
+            if j == 0:  # Set up for the 1st time
+                N=NeuralNetwork(train, y[:,j], param)
+
+            start_train = time.time()
+            N.train(2, train, y[:,j], learning_rate=rate)
+            end_train = time.time()
+
+            print("Training Duration: ", end_train-start_train, "\n initial cond: ", r0[0])
+            j += 1
+
+    # predictions.append(rates, N.predict(train)])
+
+    # plt.figure(4)
     if plots:
-        ax.plot(X, y, label='Sine', linewidth=2, color='black')
+        fig, ax = plt.subplots(1, 1)
+        ax.plot(X, y, label='True value', linewidth=2, color='black')
         for data in predictions:
+            # y = np.array(predictions)
             ax.plot(X, data[1], label="Learning Rate: "+str(data[0]))
         ax.legend()
-    plt.show()
+        plt.show()
 
 
 if __name__ == '__main__':
