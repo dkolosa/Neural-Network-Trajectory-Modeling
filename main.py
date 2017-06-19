@@ -18,11 +18,12 @@ def main():
        for a target and chaser vehicle"""
 
 
-    delta_r0 = [[0.0, 0.0, 0.0], [.80, 0.0, 0.0], [0.10, 0.0, 0.0], [0.60, 0.0, 0.0], [0.94, 0, 0]]
+    delta_r0 = [[0.0, 0.0, 0.0], [.80, 0.0, 0.0], [0.10, 0.0, 0.0], [0.60, 0.0, 0.0], [1.0, 0, 0]]
+                # [.25, 0.0, 0.0], [0.4, 0, 0], [0.7, 0, 0], [0.01, 0, 0], [0.541, 0, 0], [0.689, 0, 0]]
     delta_r0_std = np.asarray(delta_r0)
     r_test = [0.51, 0.0, 0.0]
-    tfinal = 2*np.pi/n*2
-    time_span = np.arange(0, tfinal, 10)
+    tfinal = 2*np.pi/n*1.34
+    time_span = np.arange(0, tfinal, 5)
 
     x_CW = np.zeros((len(time_span), len(delta_r0)))
     i = 0
@@ -59,15 +60,14 @@ def main():
 
     # do the ode of the CW equations
     for r0 in delta_r0:
-        startCW = time.time()
         y_CW = diffCW(time_span, a, n, r0)
-        stopCW = time.time()
-        print('Cw dynamics duration:', stopCW-startCW)
         x_CW[:,i] = y_CW[:,0]
         i += 1
 
+    print('Generated training data\n')
     y_test_CW = diffCW(time_span, a, n, r_test)
     y_test = y_test_CW[:,0]
+    print('Generated test data\n Beginning training...')
     test_regression(x_CW, delta_r0, time_span, y_test, plots=True)
 
     # Use the CW equations as input and output for a neural network
@@ -366,7 +366,7 @@ def test_regression(x_CW, delta_r0, X, y_test, plots=False):
     y = x_CW
     x0 = np.ones((len(X), len(delta_r0)))
 
-    x0_test = np.ones(len(X)) * 0.51
+    x0_test = np.ones(len(X)) * 0.857
     x0_test.shape = (-1,1)
     test_set = np.hstack((X, x0_test))
 
@@ -374,7 +374,7 @@ def test_regression(x_CW, delta_r0, X, y_test, plots=False):
     # functions.
     # param=((1,0,0),(10, expit, logistic_prime),(10, expit, logistic_prime),(1,identity, identity_prime))
     # param = ((1, 0, 0), (40, hyp_tan, hyp_tan_prime), (40, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
-    param = ((2, 0, 0), (40, hyp_tan, hyp_tan_prime), (40, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
+    param = ((2, 0, 0), (150, hyp_tan, hyp_tan_prime), (150, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
 
     #Set learning rate.
     rates = [0.001]
@@ -390,12 +390,12 @@ def test_regression(x_CW, delta_r0, X, y_test, plots=False):
                 N=NeuralNetwork(train, y[:,j], param)
 
             start_train = time.time()
-            N.train(2, train, y[:,j], learning_rate=rate)
+            N.train(10, train, y[:,j], learning_rate=rate)
             end_train = time.time()
 
-            print("Training Duration: ", end_train-start_train, "\n initial cond: ", r0[0])
+            print("initial cond: ", r0[0], "\nTraining Duration: ", end_train-start_train)
             j += 1
-
+    print('Testing network')
     predictions.append([rates, N.predict(test_set)])
 
     # plt.figure(4)
@@ -404,7 +404,7 @@ def test_regression(x_CW, delta_r0, X, y_test, plots=False):
         ax.plot(X, y_test, label='True value', linewidth=2, color='black')
         for data in predictions:
             # y = np.array(predictions)
-            ax.plot(X, data[1], label="Learning Rate: "+str(0.51))
+            ax.plot(X, data[1], label="Learning Rate: "+str(rate))
         ax.legend()
         plt.show()
 
