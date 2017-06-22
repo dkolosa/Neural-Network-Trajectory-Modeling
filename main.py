@@ -5,6 +5,8 @@ from scipy.integrate import odeint
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import time
+from sklearn.metrics import mean_squared_error
+
 from net_demo import *
 
 Re = 6378
@@ -18,11 +20,12 @@ def main():
        for a target and chaser vehicle"""
 
 
-    delta_r0 = [[0.0, 0.0, 0.0], [.80, 0.0, 0.0], [0.10, 0.0, 0.0], [0.60, 0.0, 0.0], [1.0, 0, 0]]
-                # [.25, 0.0, 0.0], [0.4, 0, 0], [0.7, 0, 0], [0.01, 0, 0], [0.541, 0, 0], [0.689, 0, 0]]
-    delta_r0_std = np.asarray(delta_r0)
+    # delta_r0 = [[0.0, 0.0, 0.0], [.80, 0.0, 0.0], [0.10, 0.0, 0.0], [0.60, 0.0, 0.0], [1.0, 0, 0]]
+    #             [.25, 0.0, 0.0], [0.4, 0, 0], [0.7, 0, 0], [0.01, 0, 0], [0.541, 0, 0], [0.689, 0, 0]]
+    delta_r0 = [[0.7, 0.0, 0.0]]
+    # delta_r0_std = np.asarray(delta_r0)
     r_test = [0.51, 0.0, 0.0]
-    tfinal = 2*np.pi/n*1.34
+    tfinal = 2*np.pi/n*1.5
     time_span = np.arange(0, tfinal, 5)
 
     x_CW = np.zeros((len(time_span), len(delta_r0)))
@@ -369,16 +372,18 @@ def test_regression(x_CW, delta_r0, X, y_test, plots=False):
     x0_test = np.ones(len(X)) * 0.857
     x0_test.shape = (-1,1)
     test_set = np.hstack((X, x0_test))
+    t_set = np.hstack((X*1.5, x0_test+.25))
 
     # make a neural net with 2 hidden layers, 20 neurons in each, using hyperbolic tan activation
     # functions.
     # param=((1,0,0),(10, expit, logistic_prime),(10, expit, logistic_prime),(1,identity, identity_prime))
     # param = ((1, 0, 0), (40, hyp_tan, hyp_tan_prime), (40, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
-    param = ((2, 0, 0), (150, hyp_tan, hyp_tan_prime), (150, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
+    param = ((2, 0, 0), (50, hyp_tan, hyp_tan_prime), (50, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
 
     #Set learning rate.
     rates = [0.001]
     predictions=[]
+    predictions2=[]
     j=0
     for rate in rates:
         for r0 in delta_r0:
@@ -390,14 +395,17 @@ def test_regression(x_CW, delta_r0, X, y_test, plots=False):
                 N=NeuralNetwork(train, y[:,j], param)
 
             start_train = time.time()
-            N.train(10, train, y[:,j], learning_rate=rate)
+            N.train(7, train, y[:,j], learning_rate=rate)
+
             end_train = time.time()
 
             print("initial cond: ", r0[0], "\nTraining Duration: ", end_train-start_train)
             j += 1
     print('Testing network')
     predictions.append([rates, N.predict(test_set)])
-
+    predictions2.append([rates, N.predict(t_set)])
+    # mse = mean_squared_error(y_test, np.asarray(predictions[0]))
+    # value =np.empty()
     # plt.figure(4)
     if plots:
         fig, ax = plt.subplots(1, 1)
@@ -405,7 +413,12 @@ def test_regression(x_CW, delta_r0, X, y_test, plots=False):
         for data in predictions:
             # y = np.array(predictions)
             ax.plot(X, data[1], label="Learning Rate: "+str(rate))
+            # np.append(value, data[1])
         ax.legend()
+        plt.figure(2)
+        for data in predictions2:
+            ax.plot(X,data[1])
+
         plt.show()
 
 
