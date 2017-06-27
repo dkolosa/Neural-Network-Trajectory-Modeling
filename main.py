@@ -17,8 +17,8 @@ def main():
     """Solving the linear CW equations given a set of state vectors
        for a target and chaser vehicle"""
 
-
-    delta_r0 = [[0.0, 0.0, 0.0], [.80, 0.0, 0.0], [0.10, 0.0, 0.0], [0.60, 0.0, 0.0], [1.0, 0, 0]]
+    delta_r0 = [[0.7,0.2,0.1]]
+    # delta_r0 = [[0.0, 0.0, 0.0], [.80, 0.0, 0.0], [0.10, 0.0, 0.0], [0.60, 0.0, 0.0], [1.0, 0, 0]]
                 # [.25, 0.0, 0.0], [0.4, 0, 0], [0.7, 0, 0], [0.01, 0, 0], [0.541, 0, 0], [0.689, 0, 0]]
     delta_r0_std = np.asarray(delta_r0)
     r_test = [0.51, 0.0, 0.0]
@@ -364,39 +364,39 @@ def test_regression(x_CW, delta_r0, X, y_test, plots=False):
     X.shape = (-1, 1)
     i = 0
     y = x_CW
-    x0 = np.ones((len(X), len(delta_r0)))
+    x0 = np.ones((len(X), 3)) * delta_r0
 
     x0_test = np.ones(len(X)) * 0.857
-    x0_test.shape = (-1,1)
+    x0_test.shape = (-1, 1)
     test_set = np.hstack((X, x0_test))
 
     # make a neural net with 2 hidden layers, 20 neurons in each, using hyperbolic tan activation
     # functions.
     # param=((1,0,0),(10, expit, logistic_prime),(10, expit, logistic_prime),(1,identity, identity_prime))
     # param = ((1, 0, 0), (40, hyp_tan, hyp_tan_prime), (40, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
-    param = ((2, 0, 0), (150, hyp_tan, hyp_tan_prime), (150, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
+    param = ((4, 0, 0), (50, hyp_tan, hyp_tan_prime), (50, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
 
     #Set learning rate.
     rates = [0.001]
     predictions=[]
     j=0
     for rate in rates:
-        for r0 in delta_r0:
-            train_input = x0[:, j] * r0[0]
-            train_input.shape = (-1,1)
-            train = np.hstack((X, train_input))
+        # for r0 in delta_r0:
+        # train_input = x0[:, j] * r0
+        # train_input.shape = (-1,1)
+        train = np.hstack((X, x0))
 
-            if j == 0:  # Set up for the 1st time
-                N=NeuralNetwork(train, y[:,j], param)
+        if j == 0:  # Set up for the 1st time
+            N=NeuralNetwork(train, y[:,j], param)
 
-            start_train = time.time()
-            N.train(10, train, y[:,j], learning_rate=rate)
-            end_train = time.time()
+        start_train = time.time()
+        N.train(5, train, y[:,j], learning_rate=rate)
+        end_train = time.time()
 
-            print("initial cond: ", r0[0], "\nTraining Duration: ", end_train-start_train)
-            j += 1
+        print("initial cond: ", delta_r0, "\nTraining Duration: ", end_train-start_train)
+        j += 1
     print('Testing network')
-    predictions.append([rates, N.predict(test_set)])
+    predictions.append([rates, N.predict(train)])
 
     # plt.figure(4)
     if plots:
