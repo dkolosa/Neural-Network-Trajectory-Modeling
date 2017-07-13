@@ -37,12 +37,12 @@ class NeuralNetwork(object):
             n = self.sizes[layer]
             m = self.sizes[layer+1]
             self.weights.append(np.random.normal(0, 1, (m, n)))
-            # self.weights.append(np.random.normal(0.0, np.power(self.sizes,-0.5), (m, n)))
+            # self.weights.append(np.random.normal(0.0, np.power(n,-0.5), (m, n)))
             self.biases.append(np.random.normal(0, 1, (m, 1)))
             self.inputs.append(np.zeros((n, 1)))
             self.outputs.append(np.zeros((n, 1)))
             self.errors.append(np.zeros((n, 1)))
-        # There are only n-1 weight matrices, so we do the last case separately.
+        # There are only n-1 weight matrices, so we do the last case separately (the output layer).
         n = self.sizes[-1]
         self.inputs.append(np.zeros((n, 1)))
         self.outputs.append(np.zeros((n, 1)))
@@ -53,17 +53,17 @@ class NeuralNetwork(object):
         Propagates the input from the input layer to the output layer.
         """
         k=len(x)
-        x.shape=(k,1)
-        self.inputs[0]=x
-        self.outputs[0]=x
+        x.shape = (k,1)
+        self.inputs[0] = x
+        self.outputs[0] = x
         for i in range(1,self.n_layers):
-            self.inputs[i]=self.weights[i-1].dot(self.outputs[i-1])+self.biases[i-1]
-            self.outputs[i]=self.fs[i](self.inputs[i])
+            self.inputs[i] = self.weights[i-1].dot(self.outputs[i-1])+self.biases[i-1]
+            self.outputs[i] = self.fs[i](self.inputs[i])
         return self.outputs[-1]
 
     def update_weights(self,x,y):
         """
-        Update the weight matrices for each layer based on a single input x and target y.
+        Update the weight matrices for each layer based on a single input x and target y. backpropogation
         """
         output = self.feedforward(x)
         self.errors[-1]=self.fprimes[-1](self.outputs[-1])*(output-y)

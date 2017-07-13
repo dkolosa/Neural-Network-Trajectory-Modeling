@@ -4,6 +4,7 @@ import numpy as np
 from scipy.integrate import odeint
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+from sklearn.metrics import mean_squared_error, accuracy_score
 import time
 from net_demo import *
 
@@ -17,15 +18,15 @@ def main():
     """Solving the linear CW equations given a set of state vectors
        for a target and chaser vehicle"""
 
-    delta_r0 = [[0.7,0.2,0.1]]
+    delta_r0 = [0.0,0.0,0.0]
     # delta_r0 = [[0.0, 0.0, 0.0], [.80, 0.0, 0.0], [0.10, 0.0, 0.0], [0.60, 0.0, 0.0], [1.0, 0, 0]]
-                # [.25, 0.0, 0.0], [0.4, 0, 0], [0.7, 0, 0], [0.01, 0, 0], [0.541, 0, 0], [0.689, 0, 0]]
+
     delta_r0_std = np.asarray(delta_r0)
-    r_test = [0.51, 0.0, 0.0]
-    tfinal = 2*np.pi/n*1.34
+    deltar0_test = [-.5, .1, 0.6]
+    tfinal = 2*np.pi/n*1
     time_span = np.arange(0, tfinal, 5)
 
-    x_CW = np.zeros((len(time_span), len(delta_r0)))
+    x_CW = np.zeros((len(time_span), 1))
     i = 0
 # """
 #    # Example 7.2 from Curtis
@@ -59,16 +60,16 @@ def main():
     # remove_data('trainingData.csv')
 
     # do the ode of the CW equations
-    for r0 in delta_r0:
-        y_CW = diffCW(time_span, a, n, r0)
-        x_CW[:,i] = y_CW[:,0]
-        i += 1
-
+    # for r0 in delta_r0:
+    y_CW = diffCW(time_span, a, n, delta_r0)
+    x_CW = y_CW[:,2]
+    i += 1
     print('Generated training data\n')
-    y_test_CW = diffCW(time_span, a, n, r_test)
-    y_test = y_test_CW[:,0]
+
+    y_test_CW = diffCW(time_span, a, n, deltar0_test)
+    # y_test = y_test_CW[:,0]
     print('Generated test data\n Beginning training...')
-    test_regression(x_CW, delta_r0, time_span, y_test, plots=True)
+    test_regression(y_CW, delta_r0, time_span, y_test_CW, deltar0_test, plots=True)
 
     # Use the CW equations as input and output for a neural network
     # test_regression(x_CW, delta_r0, time_span, True)
@@ -205,7 +206,7 @@ def diffCW(time_span, a, n, delta_r0):
 
     # Chaser
     # delta_r0 = [0.0, 0.0, 0.0]
-    delta_v0 = [0, -0.01, 0]
+    delta_v0 = [0, -0.01, .56]
     # delta_r0 = [1.2, 2.3, 1.26]
     # delta_v0 = [0.31667, 0.11199, 1.247]
     delta_y0 = delta_r0 + delta_v0
@@ -220,7 +221,7 @@ def diffCW(time_span, a, n, delta_r0):
     y_abs = odeint(two_body, y0, time_span,
                    atol=abserr, rtol=relerr)
 
-    #plots(time_span, y_rel, y_abs)
+    # plots(time_span, y_rel, y_abs)
 
     return y_rel
 
@@ -343,7 +344,7 @@ def two_body(y, t):
     return dy
 
 
-def test_regression(x_CW, delta_r0, X, y_test, plots=False):
+def test_regression(x_CW, delta_r0, X, y_test, deltar0_test, plots=False):
     """
     Creates, trains, and tests a neural network
     :param x_CW: the output dataset (used for training)
@@ -364,48 +365,103 @@ def test_regression(x_CW, delta_r0, X, y_test, plots=False):
     X.shape = (-1, 1)
     i = 0
     y = x_CW
-    x0 = np.ones((len(X), 3)) * delta_r0
+    x0 = np.ones((len(X), 1))
 
-    x0_test = np.ones(len(X)) * 0.857
-    x0_test.shape = (-1, 1)
+
+    x0_test = np.ones((len(X), 1)) * deltar0_test[0]
+    y0_test = np.ones((len(X), 1)) * deltar0_test[1]
+    z0_test = np.ones((len(X), 1)) * deltar0_test[2]
+
+    # x0_test.shape = (-1, 1)
     test_set = np.hstack((X, x0_test))
+    test_sety = np.hstack((X, y0_test))
+    test_setz = np.hstack((X, z0_test))
+
 
     # make a neural net with 2 hidden layers, 20 neurons in each, using hyperbolic tan activation
     # functions.
     # param=((1,0,0),(10, expit, logistic_prime),(10, expit, logistic_prime),(1,identity, identity_prime))
     # param = ((1, 0, 0), (40, hyp_tan, hyp_tan_prime), (40, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
-    param = ((4, 0, 0), (50, hyp_tan, hyp_tan_prime), (50, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
+    param = ((2, 0, 0), (43, hyp_tan, hyp_tan_prime), (43, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
+
+    param_y = ((2, 0, 0), (30, hyp_tan, hyp_tan_prime), (35, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
+
+    param_z = ((2, 0, 0), (10, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
 
     #Set learning rate.
-    rates = [0.001]
-    predictions=[]
+    rates = [0.0005]
+    predictions = []
+    predictions_y = []
+    predictions_z = []
+    predictions_test, predictions_y_test = [], []
+
+    mse_test = np.empty(len(X))
     j=0
     for rate in rates:
+        epochs = 5
         # for r0 in delta_r0:
         # train_input = x0[:, j] * r0
         # train_input.shape = (-1,1)
-        train = np.hstack((X, x0))
+        train = np.hstack((X, x0 * delta_r0[0]))
+        train_y = np.hstack((X,  x0 * delta_r0[1]))
+        train_z = np.hstack((X, x0 * delta_r0[2]))
+        # if j == 0:  # Set up for the 1st time
 
-        if j == 0:  # Set up for the 1st time
-            N=NeuralNetwork(train, y[:,j], param)
+
+        N=NeuralNetwork(train, y[:,0], param)
+        N_y = NeuralNetwork(train_y, y[:,1], param_y)
+        N_z = NeuralNetwork(train_z, y[:,2], param_z)
 
         start_train = time.time()
-        N.train(5, train, y[:,j], learning_rate=rate)
+        N.train(3, train, y[:,0], learning_rate=rate)
+        N_y.train(5, train_y, y[:,1], learning_rate=rate)
+        N_z.train(5, train_z, y[:,2], learning_rate=rate)
         end_train = time.time()
 
         print("initial cond: ", delta_r0, "\nTraining Duration: ", end_train-start_train)
         j += 1
     print('Testing network')
-    predictions.append([rates, N.predict(train)])
+    predictions.append(N.predict(train))
+    predictions_y.append(N_y.predict(train_y))
+    predictions_z.append(N_z.predict(train_z))
 
+    predictions_test.append(N.predict(test_set))
+    predictions_y_test.append(N_y.predict(test_sety))
+    # predictions_z_test.append(N_z.predict(test_setz))
+
+
+    # np.append(predictions,N.predict(train))
     # plt.figure(4)
     if plots:
         fig, ax = plt.subplots(1, 1)
-        ax.plot(X, y_test, label='True value', linewidth=2, color='black')
-        for data in predictions:
-            # y = np.array(predictions)
-            ax.plot(X, data[1], label="Learning Rate: "+str(rate))
+        # ax.plot(X, y[:,0], label='x value', linewidth=2, color='black')
+        # ax.plot(X, y[:,1], label='y value', linewidth=2, color='red')
+        # ax.plot(X,y[:,2], label='z value', linewidth=2, color='blue')
+        # ax.plot(X,np.asarray(predictions).flatten(), label="NN x")
+        # ax.plot(X,np.asarray(predictions_y).flatten(), label="NN y")
+        # ax.plot(X,np.asarray(predictions_z).flatten(), label="NN z")
+        ax.plot(X, y_test[:, 0], label='x test', linewidth=3)
+        ax.plot(X, y_test[:, 1], label='y test', linewidth=3)
+        ax.plot(X, np.asarray(predictions_test).flatten(), label="NN x test")
+        ax.plot(X, np.asarray(predictions_y_test).flatten(), label="NN y test")
+
+        # for data in predictions:
+        #     ax.plot(X, data[1], label="NN x "+str(rate))
+            # np.append(mse_test, data[1])
+        # for data in predictions_y:
+        #     ax.plot(X, data[1], label='NN y set')
+        # for data in predictions_z:
+        #     ax.plot(X, data[1], label='NN z set')
+
         ax.legend()
+
+        print('MSE training X: ', mean_squared_error(y[:,0], np.asarray(predictions).flatten()))
+        print('MSE training Y: ', mean_squared_error(y[:,1], np.asarray(predictions_y).flatten()))
+
+        print('MSE test X: ', mean_squared_error(y_test[:,0], np.asarray(predictions_test).flatten()))
+        print('MSE test Y: ', mean_squared_error(y_test[:,1], np.asarray(predictions_y_test).flatten()))
+
+        # print(mean_squared_error(y[:,1], np.asarray(predictions_z).flatten())
         plt.show()
 
 
