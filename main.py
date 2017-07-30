@@ -18,13 +18,13 @@ def main():
     """Solving the linear CW equations given a set of state vectors
        for a target and chaser vehicle"""
 
-    delta_r0 = [0.0,0.0,0.0]
+    delta_r0 = [.5,0,.2]
     # delta_r0 = [[0.0, 0.0, 0.0], [.80, 0.0, 0.0], [0.10, 0.0, 0.0], [0.60, 0.0, 0.0], [1.0, 0, 0]]
 
     delta_r0_std = np.asarray(delta_r0)
-    deltar0_test = [-.5, .1, 0.6]
+    deltar0_test = [1, .2, .5]
     tfinal = 2*np.pi/n*1
-    time_span = np.arange(0, tfinal, 5)
+    time_span = np.arange(0, tfinal, 10)
 
     x_CW = np.zeros((len(time_span), 1))
     i = 0
@@ -382,18 +382,22 @@ def test_regression(x_CW, delta_r0, X, y_test, deltar0_test, plots=False):
     # functions.
     # param=((1,0,0),(10, expit, logistic_prime),(10, expit, logistic_prime),(1,identity, identity_prime))
     # param = ((1, 0, 0), (40, hyp_tan, hyp_tan_prime), (40, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
-    param = ((2, 0, 0), (43, hyp_tan, hyp_tan_prime), (43, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
+    # param = ((3, 0, 0), (43, hyp_tan, hyp_tan_prime), (43, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
 
-    param_y = ((2, 0, 0), (30, hyp_tan, hyp_tan_prime), (35, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
+    param = ((2, 0, 0), (12, hyp_tan, hyp_tan_prime), (12, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
 
-    param_z = ((2, 0, 0), (10, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
+
+    param_y = ((2, 0, 0), (28, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
+
+    param_z = ((2, 0, 0), (60, hyp_tan, hyp_tan_prime), (60, hyp_tan, hyp_tan_prime),
+               (60, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
 
     #Set learning rate.
-    rates = [0.0005]
+    rates = [0.005]
     predictions = []
     predictions_y = []
     predictions_z = []
-    predictions_test, predictions_y_test = [], []
+    predictions_test, predictions_y_test, predictions_z_test = [], [], []
 
     mse_test = np.empty(len(X))
     j=0
@@ -402,7 +406,8 @@ def test_regression(x_CW, delta_r0, X, y_test, deltar0_test, plots=False):
         # for r0 in delta_r0:
         # train_input = x0[:, j] * r0
         # train_input.shape = (-1,1)
-        train = np.hstack((X, x0 * delta_r0[0]))
+        # train = np.column_stack((X, x0 * delta_r0[0], x0 * delta_r0[1]))
+        train = np.hstack((X,  x0 * delta_r0[0]))
         train_y = np.hstack((X,  x0 * delta_r0[1]))
         train_z = np.hstack((X, x0 * delta_r0[2]))
         # if j == 0:  # Set up for the 1st time
@@ -414,8 +419,8 @@ def test_regression(x_CW, delta_r0, X, y_test, deltar0_test, plots=False):
 
         start_train = time.time()
         N.train(3, train, y[:,0], learning_rate=rate)
-        N_y.train(5, train_y, y[:,1], learning_rate=rate)
-        N_z.train(5, train_z, y[:,2], learning_rate=rate)
+        N_y.train(3, train_y, y[:,1], learning_rate=0.001)
+        N_z.train(5, train_z, y[:,2], learning_rate=0.001)
         end_train = time.time()
 
         print("initial cond: ", delta_r0, "\nTraining Duration: ", end_train-start_train)
@@ -423,7 +428,7 @@ def test_regression(x_CW, delta_r0, X, y_test, deltar0_test, plots=False):
     print('Testing network')
     predictions.append(N.predict(train))
     predictions_y.append(N_y.predict(train_y))
-    predictions_z.append(N_z.predict(train_z))
+    # predictions_z.append(N_z.predict(train_z))
 
     predictions_test.append(N.predict(test_set))
     predictions_y_test.append(N_y.predict(test_sety))
@@ -442,8 +447,11 @@ def test_regression(x_CW, delta_r0, X, y_test, deltar0_test, plots=False):
         # ax.plot(X,np.asarray(predictions_z).flatten(), label="NN z")
         ax.plot(X, y_test[:, 0], label='x test', linewidth=3)
         ax.plot(X, y_test[:, 1], label='y test', linewidth=3)
+        # ax.plot(X, y_test[:, 2], label='z test', linewidth=3)
+
         ax.plot(X, np.asarray(predictions_test).flatten(), label="NN x test")
         ax.plot(X, np.asarray(predictions_y_test).flatten(), label="NN y test")
+        # ax.plot(X, np.asarray(predictions_z_test).flatten(), label="NN z test")
 
         # for data in predictions:
         #     ax.plot(X, data[1], label="NN x "+str(rate))
@@ -457,9 +465,13 @@ def test_regression(x_CW, delta_r0, X, y_test, deltar0_test, plots=False):
 
         print('MSE training X: ', mean_squared_error(y[:,0], np.asarray(predictions).flatten()))
         print('MSE training Y: ', mean_squared_error(y[:,1], np.asarray(predictions_y).flatten()))
+        # print('MSE training Z: ', mean_squared_error(y[:,2], np.asarray(predictions_z).flatten()))
+
+
 
         print('MSE test X: ', mean_squared_error(y_test[:,0], np.asarray(predictions_test).flatten()))
         print('MSE test Y: ', mean_squared_error(y_test[:,1], np.asarray(predictions_y_test).flatten()))
+        # print('MSE test Z: ', mean_squared_error(y_test[:,2], np.asarray(predictions_z_test).flatten()))
 
         # print(mean_squared_error(y[:,1], np.asarray(predictions_z).flatten())
         plt.show()
