@@ -384,10 +384,10 @@ def test_regression(x_CW, delta_r0, X, y_test, deltar0_test, plots=False):
     # param = ((1, 0, 0), (40, hyp_tan, hyp_tan_prime), (40, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
     # param = ((3, 0, 0), (43, hyp_tan, hyp_tan_prime), (43, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
 
-    param = ((2, 0, 0), (12, hyp_tan, hyp_tan_prime), (12, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
+    param = ((2, 0, 0), (10, hyp_tan, hyp_tan_prime), (10, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
 
 
-    param_y = ((2, 0, 0), (28, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
+    param_y = ((2, 0, 0), (8, hyp_tan, hyp_tan_prime), (8, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
 
     param_z = ((2, 0, 0), (60, hyp_tan, hyp_tan_prime), (60, hyp_tan, hyp_tan_prime),
                (60, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
@@ -413,24 +413,24 @@ def test_regression(x_CW, delta_r0, X, y_test, deltar0_test, plots=False):
         # if j == 0:  # Set up for the 1st time
 
 
-        N=NeuralNetwork(train, y[:,0], param)
+        # N=NeuralNetwork(train, y[:,0], param)
         N_y = NeuralNetwork(train_y, y[:,1], param_y)
         N_z = NeuralNetwork(train_z, y[:,2], param_z)
 
         start_train = time.time()
-        N.train(3, train, y[:,0], learning_rate=rate)
-        N_y.train(3, train_y, y[:,1], learning_rate=0.001)
-        N_z.train(5, train_z, y[:,2], learning_rate=0.001)
+        # N.train(3, train, y[:,0], learning_rate=rate)
+        N_y.train(4, train_y, y[:,1], learning_rate=0.001)
+        # N_z.train(5, train_z, y[:,2], learning_rate=0.001)
         end_train = time.time()
 
         print("initial cond: ", delta_r0, "\nTraining Duration: ", end_train-start_train)
         j += 1
     print('Testing network')
-    predictions.append(N.predict(train))
+    # predictions.append(N.predict(train))
     predictions_y.append(N_y.predict(train_y))
     # predictions_z.append(N_z.predict(train_z))
 
-    predictions_test.append(N.predict(test_set))
+    # predictions_test.append(N.predict(test_set))
     predictions_y_test.append(N_y.predict(test_sety))
     # predictions_z_test.append(N_z.predict(test_setz))
 
@@ -445,11 +445,11 @@ def test_regression(x_CW, delta_r0, X, y_test, deltar0_test, plots=False):
         # ax.plot(X,np.asarray(predictions).flatten(), label="NN x")
         # ax.plot(X,np.asarray(predictions_y).flatten(), label="NN y")
         # ax.plot(X,np.asarray(predictions_z).flatten(), label="NN z")
-        ax.plot(X, y_test[:, 0], label='x test', linewidth=3)
+        # ax.plot(X, y_test[:, 0], label='x test', linewidth=3)
         ax.plot(X, y_test[:, 1], label='y test', linewidth=3)
         # ax.plot(X, y_test[:, 2], label='z test', linewidth=3)
 
-        ax.plot(X, np.asarray(predictions_test).flatten(), label="NN x test")
+        # ax.plot(X, np.asarray(predictions_test).flatten(), label="NN x test")
         ax.plot(X, np.asarray(predictions_y_test).flatten(), label="NN y test")
         # ax.plot(X, np.asarray(predictions_z_test).flatten(), label="NN z test")
 
@@ -463,13 +463,13 @@ def test_regression(x_CW, delta_r0, X, y_test, deltar0_test, plots=False):
 
         ax.legend()
 
-        print('MSE training X: ', mean_squared_error(y[:,0], np.asarray(predictions).flatten()))
+        # print('MSE training X: ', mean_squared_error(y[:,0], np.asarray(predictions).flatten()))
         print('MSE training Y: ', mean_squared_error(y[:,1], np.asarray(predictions_y).flatten()))
         # print('MSE training Z: ', mean_squared_error(y[:,2], np.asarray(predictions_z).flatten()))
 
 
 
-        print('MSE test X: ', mean_squared_error(y_test[:,0], np.asarray(predictions_test).flatten()))
+        # print('MSE test X: ', mean_squared_error(y_test[:,0], np.asarray(predictions_test).flatten()))
         print('MSE test Y: ', mean_squared_error(y_test[:,1], np.asarray(predictions_y_test).flatten()))
         # print('MSE test Z: ', mean_squared_error(y_test[:,2], np.asarray(predictions_z_test).flatten()))
 
