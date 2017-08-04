@@ -22,7 +22,7 @@ def main():
     delta_r0 = [[0.0, 0.0, 0.0], [.80, 0.30, 0.40], [0.10, 0.20, 0.10]]
 
     delta_r0_std = np.asarray(delta_r0)
-    deltar0_test = [.4, .4, .5]
+    deltar0_test = [.4, .4, .2]
     tfinal = 2*np.pi/n*1
     time_span = np.arange(0, tfinal, 2)
 
@@ -399,7 +399,7 @@ def test_regression(x_CW, xy_CW, xz_CW,delta_r0, X, y_test, deltar0_test, plots=
 
     param_y = ((2, 0, 0), (40, logistic, logistic_prime), (40, logistic, logistic_prime), (1, identity, identity_prime))
 
-    param_z = ((2, 0, 0), (40, hyp_tan, hyp_tan_prime), (40, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
+    param_z = ((2, 0, 0), (60, hyp_tan, hyp_tan_prime), (60, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
 
     #Set learning rate.
     rates = [0.005]
@@ -428,7 +428,7 @@ def test_regression(x_CW, xy_CW, xz_CW,delta_r0, X, y_test, deltar0_test, plots=
             # start_train = time.time()
             N.train(5, train, y[:,j], learning_rate=rate)
             N_y.train(3, train_y, yy[:,j], learning_rate=0.005)
-            N_z.train(5, train_z, yz[:,j], learning_rate=rate)
+            N_z.train(8, train_z, yz[:,j], learning_rate=0.005)
 
             print("initial cond: ", r0)
             j += 1
@@ -454,12 +454,12 @@ def test_regression(x_CW, xy_CW, xz_CW,delta_r0, X, y_test, deltar0_test, plots=
         # ax.plot(X,np.asarray(predictions).flatten(), label="NN x")
         # ax.plot(X,np.asarray(predictions_y).flatten(), label="NN y")
         # ax.plot(X,np.asarray(predictions_z).flatten(), label="NN z")
-        # ax.plot(X, y_test[:, 0], label='x test', linewidth=3)
-        # ax.plot(X, y_test[:, 1], label='y test', linewidth=3)
-        ax.plot(X, yz[:, 0]*z_norm, label='z test', linewidth=3)
+        ax.plot(X, y_test[:, 0], label='x test', linewidth=3)
+        ax.plot(X, y_test[:, 1], label='y test', linewidth=3)
+        ax.plot(X, y_test[:, 2], label='z test', linewidth=3)
 
-        # ax.plot(X, np.asarray(predictions_test).flatten(), label="NN x test")
-        # ax.plot(X, np.asarray(predictions_y).flatten(), label="NN y test")
+        ax.plot(X, np.asarray(predictions_test).flatten(), label="NN x test")
+        ax.plot(X, np.asarray(predictions_y).flatten(), label="NN y test")
         ax.plot(X, np.asarray(predictions_z).flatten()*z_norm, label="NN z test")
 
         # for data in predictions:
@@ -489,7 +489,7 @@ def test_regression(x_CW, xy_CW, xz_CW,delta_r0, X, y_test, deltar0_test, plots=
         print('r2 test X: ', r2_score(y_test[:,0], np.asarray(predictions_test).flatten()))
 
         print('MSE test Y: ', mean_squared_error(y_test[:,1], np.asarray(predictions_y_test).flatten()))
-        # print('MSE test z: ', mean_squared_error(y_test[:,2], np.asarray(predictions_z_test).flatten()))
+        print('MSE test z: ', mean_squared_error(y_test[:,2], np.asarray(predictions_z_test).flatten()*z_norm))
 
         # print(mean_squared_error(y[:,1], np.asarray(predictions_z).flatten())
         plt.show()
