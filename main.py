@@ -391,7 +391,7 @@ def test_regression(x_CW, xy_CW, delta_r0, X, y_test, deltar0_test, plots=False)
     param = ((2, 0, 0), (12, hyp_tan, hyp_tan_prime), (12, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
 
 
-    param_y = ((2, 0, 0), (80, logistic, logistic_prime), (80, logistic, logistic_prime), (1, identity, identity_prime))
+    param_y = ((2, 0, 0), (40, logistic, logistic_prime), (40, logistic, logistic_prime), (1, identity, identity_prime))
     #
     # param_z = ((2, 0, 0), (60, hyp_tan, hyp_tan_prime), (60, hyp_tan, hyp_tan_prime),
     #            (60, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
@@ -450,11 +450,11 @@ def test_regression(x_CW, xy_CW, delta_r0, X, y_test, deltar0_test, plots=False)
         # ax.plot(X,np.asarray(predictions_y).flatten(), label="NN y")
         # ax.plot(X,np.asarray(predictions_z).flatten(), label="NN z")
         ax.plot(X, y_test[:, 0], label='x test', linewidth=3)
-        ax.plot(X, y_test[:, 1], label='y test', linewidth=3)
+        ax.plot(X, yy[:, 0], label='y test', linewidth=3)
         # ax.plot(X, y_test[:, 2], label='z test', linewidth=3)
 
         ax.plot(X, np.asarray(predictions_test).flatten(), label="NN x test")
-        ax.plot(X, np.asarray(predictions_y_test).flatten(), label="NN y test")
+        ax.plot(X, np.asarray(predictions_y).flatten(), label="NN y test")
         # ax.plot(X, np.asarray(predictions_z_test).flatten(), label="NN z test")
 
         # for data in predictions:
@@ -472,7 +472,7 @@ def test_regression(x_CW, xy_CW, delta_r0, X, y_test, deltar0_test, plots=False)
         print('MSE training X: ', mean_squared_error(y[:,0], np.asarray(predictions).flatten()))
         print('r2 training X: ', r2_score(y[:,0], np.asarray(predictions).flatten()))
 
-        print('MSE training Y: ', mean_squared_error(y[:,1], np.asarray(predictions_y).flatten()))
+        print('MSE training Y: ', mean_squared_error(yy[:,0], np.asarray(predictions_y).flatten()))
         print('r2 training Y: ', r2_score(y[:,1], np.asarray(predictions_y).flatten()))
 
         # print('MSE training Z: ', mean_squared_error(y[:,2], np.asarray(predictions_z).flatten()))
