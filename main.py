@@ -28,6 +28,7 @@ def main():
 
     x_CW = np.zeros((len(time_span), 6))
     xy_CW = np.zeros((len(time_span), 6))
+    xz_CW = np.zeros((len(time_span), 6))
     i = 0
 # """
 #    # Example 7.2 from Curtis
@@ -61,19 +62,21 @@ def main():
     # remove_data('trainingData.csv')
 
     # do the ode of the CW equations
+    print('Generating training data\n')
     for r0 in delta_r0:
         y_CW = diffCW(time_span, a, n, r0)
 
         x_CW[:,i] = y_CW[:,0]
         xy_CW[:,i] = y_CW[:,1]
+        xz_CW[:,i] = y_CW[:,2]
         i += 1
 
     print('Generated training data\n')
-
     y_test_CW = diffCW(time_span, a, n, deltar0_test)
     # y_test = y_test_CW[:,0]
+
     print('Generated test data\n Beginning training...')
-    test_regression(x_CW, xy_CW, delta_r0, time_span, y_test_CW, deltar0_test, plots=True)
+    test_regression(x_CW, xy_CW, xz_CW, delta_r0, time_span, y_test_CW, deltar0_test, plots=True)
 
     # Use the CW equations as input and output for a neural network
     # test_regression(x_CW, delta_r0, time_span, True)
@@ -348,7 +351,7 @@ def two_body(y, t):
     return dy
 
 
-def test_regression(x_CW, xy_CW, delta_r0, X, y_test, deltar0_test, plots=False):
+def test_regression(x_CW, xy_CW, xz_CW,delta_r0, X, y_test, deltar0_test, plots=False):
     """
     Creates, trains, and tests a neural network
     :param x_CW: the output dataset (used for training)
@@ -364,11 +367,14 @@ def test_regression(x_CW, xy_CW, delta_r0, X, y_test, deltar0_test, plots=False)
     # X.shape = (n, 1)
     # y = np.sin(X)
 
+    y_norm = 100
+    z_norm = 500
     # Process training data for neural network
     X = X / (60**2)
     X.shape = (-1, 1)
     y = x_CW
     yy = xy_CW
+    yz = xz_CW / z_norm
     x0 = np.ones((len(X), 1))
 
 
@@ -392,9 +398,8 @@ def test_regression(x_CW, xy_CW, delta_r0, X, y_test, deltar0_test, plots=False)
 
 
     param_y = ((2, 0, 0), (40, logistic, logistic_prime), (40, logistic, logistic_prime), (1, identity, identity_prime))
-    #
-    # param_z = ((2, 0, 0), (60, hyp_tan, hyp_tan_prime), (60, hyp_tan, hyp_tan_prime),
-    #            (60, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
+
+    param_z = ((2, 0, 0), (40, hyp_tan, hyp_tan_prime), (40, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
 
     #Set learning rate.
     rates = [0.005]
@@ -413,17 +418,17 @@ def test_regression(x_CW, xy_CW, delta_r0, X, y_test, deltar0_test, plots=False)
             # train = np.column_stack((X, x0 * delta_r0[0], x0 * delta_r0[1]))
             train = np.hstack((X,  x0 * r0[0]))
             train_y = np.hstack((X,  x0 * r0[1]))
-            # train_z = np.hstack((X, x0 * r0[2]))
+            train_z = np.hstack((X, x0 * r0[2]))
 
             if j == 0:  # Set up for the 1st time
                 N=NeuralNetwork(train, y[:,0], param)
                 N_y = NeuralNetwork(train_y, yy[:,0], param_y)
-                # N_z = NeuralNetwork(train_z, y[:,2], param_z)
+                N_z = NeuralNetwork(train_z, yz[:,0], param_z)
 
             # start_train = time.time()
             N.train(5, train, y[:,j], learning_rate=rate)
             N_y.train(3, train_y, yy[:,j], learning_rate=0.005)
-            # N_z.train(5, train_z, y[:,2], learning_rate=0.001)
+            N_z.train(5, train_z, yz[:,j], learning_rate=rate)
 
             print("initial cond: ", r0)
             j += 1
@@ -432,11 +437,11 @@ def test_regression(x_CW, xy_CW, delta_r0, X, y_test, deltar0_test, plots=False)
     print('Testing network')
     predictions.append(N.predict(train))
     predictions_y.append(N_y.predict(train_y))
-    # predictions_z.append(N_z.predict(train_z))
+    predictions_z.append(N_z.predict(train_z))
 
     predictions_test.append(N.predict(test_set))
     predictions_y_test.append(N_y.predict(test_sety))
-    # predictions_z_test.append(N_z.predict(test_setz))
+    predictions_z_test.append(N_z.predict(test_setz))
 
 
     # np.append(predictions,N.predict(train))
@@ -449,13 +454,13 @@ def test_regression(x_CW, xy_CW, delta_r0, X, y_test, deltar0_test, plots=False)
         # ax.plot(X,np.asarray(predictions).flatten(), label="NN x")
         # ax.plot(X,np.asarray(predictions_y).flatten(), label="NN y")
         # ax.plot(X,np.asarray(predictions_z).flatten(), label="NN z")
-        ax.plot(X, y_test[:, 0], label='x test', linewidth=3)
-        ax.plot(X, yy[:, 0], label='y test', linewidth=3)
-        # ax.plot(X, y_test[:, 2], label='z test', linewidth=3)
+        # ax.plot(X, y_test[:, 0], label='x test', linewidth=3)
+        # ax.plot(X, y_test[:, 1], label='y test', linewidth=3)
+        ax.plot(X, yz[:, 0]*z_norm, label='z test', linewidth=3)
 
-        ax.plot(X, np.asarray(predictions_test).flatten(), label="NN x test")
-        ax.plot(X, np.asarray(predictions_y).flatten(), label="NN y test")
-        # ax.plot(X, np.asarray(predictions_z_test).flatten(), label="NN z test")
+        # ax.plot(X, np.asarray(predictions_test).flatten(), label="NN x test")
+        # ax.plot(X, np.asarray(predictions_y).flatten(), label="NN y test")
+        ax.plot(X, np.asarray(predictions_z).flatten()*z_norm, label="NN z test")
 
         # for data in predictions:
         #     ax.plot(X, data[1], label="NN x "+str(rate))
@@ -469,21 +474,22 @@ def test_regression(x_CW, xy_CW, delta_r0, X, y_test, deltar0_test, plots=False)
         plt.xlabel('Time (hr)')
         plt.ylabel('Position (km)')
 
+        print('---Training---')
         print('MSE training X: ', mean_squared_error(y[:,0], np.asarray(predictions).flatten()))
         print('r2 training X: ', r2_score(y[:,0], np.asarray(predictions).flatten()))
 
         print('MSE training Y: ', mean_squared_error(yy[:,0], np.asarray(predictions_y).flatten()))
         print('r2 training Y: ', r2_score(y[:,1], np.asarray(predictions_y).flatten()))
 
-        # print('MSE training Z: ', mean_squared_error(y[:,2], np.asarray(predictions_z).flatten()))
+        print('MSE training Z: ', mean_squared_error(yz[:,0], np.asarray(predictions_z).flatten()))
 
 
-
+        print('---Testing---')
         print('MSE test X: ', mean_squared_error(y_test[:,0], np.asarray(predictions_test).flatten()))
         print('r2 test X: ', r2_score(y_test[:,0], np.asarray(predictions_test).flatten()))
 
         print('MSE test Y: ', mean_squared_error(y_test[:,1], np.asarray(predictions_y_test).flatten()))
-        # print('MSE test Z: ', mean_squared_error(y_test[:,2], np.asarray(predictions_z_test).flatten()))
+        # print('MSE test z: ', mean_squared_error(y_test[:,2], np.asarray(predictions_z_test).flatten()))
 
         # print(mean_squared_error(y[:,1], np.asarray(predictions_z).flatten())
         plt.show()
