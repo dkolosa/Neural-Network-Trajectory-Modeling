@@ -20,15 +20,20 @@ def main():
 
     # delta_r0 = [.5,0,.2]
     delta_r0 = [[0.0, 0.0, 0.0], [.80, 0.30, 0.40], [0.10, 0.20, 0.10]]
+                # [0.30, 0.80, 0.90], [.50, 0.70, 0.90], [0.60, 0.30, 0.20],
+                # [0.1, 0.40, 0.70], [.450, 0.20, 0.40], [1.0, 0.30, 0.20],
+                # [0.41, 0.47, 1.00], [.87, 0.70, 0.82], [0.00, 1.00, 0.41],
+                # [1.00, 1.00, 1.00], [.254, 0.698, 0.475], [1.0, .147, 1.0],
+                # [0.214, 0.475, 1.00], [.325, 0.469, 0.82], [0.124, 0.241, 0.658]]
 
     delta_r0_std = np.asarray(delta_r0)
     deltar0_test = [.4, .4, .2]
     tfinal = 2*np.pi/n*1
     time_span = np.arange(0, tfinal, 2)
 
-    x_CW = np.zeros((len(time_span), 6))
-    xy_CW = np.zeros((len(time_span), 6))
-    xz_CW = np.zeros((len(time_span), 6))
+    x_CW = np.zeros((len(time_span), 3))
+    xy_CW = np.zeros((len(time_span), 3))
+    xz_CW = np.zeros((len(time_span), 3))
     i = 0
 # """
 #    # Example 7.2 from Curtis
@@ -351,13 +356,16 @@ def two_body(y, t):
     return dy
 
 
-def test_regression(x_CW, xy_CW, xz_CW,delta_r0, X, y_test, deltar0_test, plots=False):
+def test_regression(x_cw, xy_cw, xz_cw, delta_r0, X, y_test, deltar0_test, plots=False):
     """
     Creates, trains, and tests a neural network
-    :param x_CW: the output dataset (used for training)
+    :param x_cw: the output dataset (used for training, x component)
+    :param xy_cw: the output dataset (used for training, y component)
+    :param xz_cw: the output dataset (used for training, z component)
     :param delta_r0: initial conditions of the training set
     :param X: time span of the dataset (input)
     :param y_test: the test data of the CW equation
+    :param deltar0_test: the test initial positions
     :param plots: generate the plots of training and test data
     :return: null
     """
@@ -367,14 +375,14 @@ def test_regression(x_CW, xy_CW, xz_CW,delta_r0, X, y_test, deltar0_test, plots=
     # X.shape = (n, 1)
     # y = np.sin(X)
 
-    y_norm = 100
+    y_norm = 150
     z_norm = 500
     # Process training data for neural network
     X = X / (60**2)
     X.shape = (-1, 1)
-    y = x_CW
-    yy = xy_CW
-    yz = xz_CW / z_norm
+    y = x_cw
+    yy = xy_cw
+    yz = xz_cw / z_norm
     x0 = np.ones((len(X), 1))
 
 
@@ -397,7 +405,7 @@ def test_regression(x_CW, xy_CW, xz_CW,delta_r0, X, y_test, deltar0_test, plots=
     param = ((2, 0, 0), (12, hyp_tan, hyp_tan_prime), (12, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
 
 
-    param_y = ((2, 0, 0), (40, logistic, logistic_prime), (40, logistic, logistic_prime), (1, identity, identity_prime))
+    param_y = ((2, 0, 0), (20, logistic, logistic_prime), (20, logistic, logistic_prime), (1, identity, identity_prime))
 
     param_z = ((2, 0, 0), (60, hyp_tan, hyp_tan_prime), (60, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
 
@@ -459,8 +467,8 @@ def test_regression(x_CW, xy_CW, xz_CW,delta_r0, X, y_test, deltar0_test, plots=
         ax.plot(X, y_test[:, 2], label='z test', linewidth=3)
 
         ax.plot(X, np.asarray(predictions_test).flatten(), label="NN x test")
-        ax.plot(X, np.asarray(predictions_y).flatten(), label="NN y test")
-        ax.plot(X, np.asarray(predictions_z).flatten()*z_norm, label="NN z test")
+        ax.plot(X, np.asarray(predictions_y_test).flatten(), label="NN y test")
+        ax.plot(X, np.asarray(predictions_z_test).flatten()*z_norm, label="NN z test")
 
         # for data in predictions:
         #     ax.plot(X, data[1], label="NN x "+str(rate))
@@ -479,20 +487,23 @@ def test_regression(x_CW, xy_CW, xz_CW,delta_r0, X, y_test, deltar0_test, plots=
         print('r2 training X: ', r2_score(y[:,0], np.asarray(predictions).flatten()))
 
         print('MSE training Y: ', mean_squared_error(yy[:,0], np.asarray(predictions_y).flatten()))
-        print('r2 training Y: ', r2_score(y[:,1], np.asarray(predictions_y).flatten()))
+        print('r2 training Y: ', r2_score(yy[:,1], np.asarray(predictions_y).flatten()))
 
         print('MSE training Z: ', mean_squared_error(yz[:,0], np.asarray(predictions_z).flatten()))
+        print('r2 training Z: ', r2_score(yz[:,2], np.asarray(predictions_z).flatten()))
 
 
         print('---Testing---')
         print('MSE test X: ', mean_squared_error(y_test[:,0], np.asarray(predictions_test).flatten()))
-        print('r2 test X: ', r2_score(y_test[:,0], np.asarray(predictions_test).flatten()))
+        # print('r2 test X: ', r2_score(y_test[:,0], np.asarray(predictions_test).flatten()))
 
         print('MSE test Y: ', mean_squared_error(y_test[:,1], np.asarray(predictions_y_test).flatten()))
         print('MSE test z: ', mean_squared_error(y_test[:,2], np.asarray(predictions_z_test).flatten()*z_norm))
 
         # print(mean_squared_error(y[:,1], np.asarray(predictions_z).flatten())
         plt.show()
+
+        pass
 
 
 if __name__ == '__main__':
