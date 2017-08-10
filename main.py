@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from sklearn.metrics import mean_squared_error, r2_score
 import time
+import random
 from net_demo import *
 
 Re = 6378
@@ -13,13 +14,14 @@ mu = 398600
 hr_to_sec = 60 ** 2
 a = 300 + Re  # semi-major axis
 n = np.sqrt(mu / a ** 3)  # mean motion circular orbit
-
+cw_problems = 50
 def main():
     """Solving the linear CW equations given a set of state vectors
        for a target and chaser vehicle"""
 
     # delta_r0 = [.5,0,.2]
-    delta_r0 = [[0.0, 0.0, 0.0], [.80, 0.30, 0.40], [0.10, 0.20, 0.10]]
+    delta_r0 = [[random.random() for i in range(3)] for j in range(cw_problems)]
+    # delta_r0 = [[0.0, 0.0, 0.0], [.80, 0.30, 0.40], [0.10, 0.20, 0.10]]
                 # [0.30, 0.80, 0.90], [.50, 0.70, 0.90], [0.60, 0.30, 0.20],
                 # [0.1, 0.40, 0.70], [.450, 0.20, 0.40], [1.0, 0.30, 0.20],
                 # [0.41, 0.47, 1.00], [.87, 0.70, 0.82], [0.00, 1.00, 0.41],
@@ -28,13 +30,17 @@ def main():
 
     delta_r0_std = np.asarray(delta_r0)
     deltar0_test = [.4, .4, .2]
+    deltar0_test = [[random.random() for i in range(3)] for j in range(cw_problems)]
     tfinal = 2*np.pi/n*1
     time_span = np.arange(0, tfinal, 2)
 
-    x_CW = np.zeros((len(time_span), 3))
-    xy_CW = np.zeros((len(time_span), 3))
-    xz_CW = np.zeros((len(time_span), 3))
-    i = 0
+    x_CW = np.zeros((len(time_span), cw_problems))
+    xy_CW = np.zeros((len(time_span), cw_problems))
+    xz_CW = np.zeros((len(time_span), cw_problems))
+
+    x_test = np.zeros((len(time_span), cw_problems))
+    y_test = np.zeros((len(time_span), cw_problems))
+    z_test = np.zeros((len(time_span), cw_problems))
 # """
 #    # Example 7.2 from Curtis
 #
@@ -68,6 +74,7 @@ def main():
 
     # do the ode of the CW equations
     print('Generating training data\n')
+    i = 0
     for r0 in delta_r0:
         y_CW = diffCW(time_span, a, n, r0)
 
@@ -77,11 +84,16 @@ def main():
         i += 1
 
     print('Generated training data\n')
-    y_test_CW = diffCW(time_span, a, n, deltar0_test)
-    # y_test = y_test_CW[:,0]
+    i = 0
+    for r0_test in deltar0_test:
+        y_test_CW = diffCW(time_span, a, n, r0_test)
+        x_test[:,i] = y_test_CW[:,0]
+        y_test[:,i] = y_test_CW[:,1]
+        z_test[:,i] = y_test_CW[:,2]
+        i += 1
 
     print('Generated test data\n Beginning training...')
-    test_regression(x_CW, xy_CW, xz_CW, delta_r0, time_span, y_test_CW, deltar0_test, plots=True)
+    test_regression(x_CW, xy_CW, xz_CW, delta_r0, time_span, x_test, y_test, z_test, deltar0_test, plots=True)
 
     # Use the CW equations as input and output for a neural network
     # test_regression(x_CW, delta_r0, time_span, True)
@@ -356,7 +368,7 @@ def two_body(y, t):
     return dy
 
 
-def test_regression(x_cw, xy_cw, xz_cw, delta_r0, X, y_test, deltar0_test, plots=False):
+def test_regression(x_cw, xy_cw, xz_cw, delta_r0, X, x_test, y_test, z_test, deltar0_test, plots=False):
     """
     Creates, trains, and tests a neural network
     :param x_cw: the output dataset (used for training, x component)
@@ -386,15 +398,6 @@ def test_regression(x_cw, xy_cw, xz_cw, delta_r0, X, y_test, deltar0_test, plots
     x0 = np.ones((len(X), 1))
 
 
-    x0_test = np.ones((len(X), 1)) * deltar0_test[0]
-    y0_test = np.ones((len(X), 1)) * deltar0_test[1]
-    z0_test = np.ones((len(X), 1)) * deltar0_test[2]
-
-    # x0_test.shape = (-1, 1)
-    test_set = np.hstack((X, x0_test))
-    test_sety = np.hstack((X, y0_test))
-    test_setz = np.hstack((X, z0_test))
-
 
     # make a neural net with 2 hidden layers, 20 neurons in each, using hyperbolic tan activation
     # functions.
@@ -405,9 +408,9 @@ def test_regression(x_cw, xy_cw, xz_cw, delta_r0, X, y_test, deltar0_test, plots
     param = ((2, 0, 0), (12, hyp_tan, hyp_tan_prime), (12, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
 
 
-    param_y = ((2, 0, 0), (20, logistic, logistic_prime), (20, logistic, logistic_prime), (1, identity, identity_prime))
+    param_y = ((2, 0, 0), (30, logistic, logistic_prime), (30, logistic, logistic_prime), (1, identity, identity_prime))
 
-    param_z = ((2, 0, 0), (60, hyp_tan, hyp_tan_prime), (60, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
+    param_z = ((2, 0, 0), (55, hyp_tan, hyp_tan_prime), (55, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
 
     #Set learning rate.
     rates = [0.005]
@@ -434,22 +437,50 @@ def test_regression(x_cw, xy_cw, xz_cw, delta_r0, X, y_test, deltar0_test, plots
                 N_z = NeuralNetwork(train_z, yz[:,0], param_z)
 
             # start_train = time.time()
-            N.train(5, train, y[:,j], learning_rate=rate)
+            N.train(4, train, y[:,j], learning_rate=rate)
             N_y.train(3, train_y, yy[:,j], learning_rate=0.005)
-            N_z.train(8, train_z, yz[:,j], learning_rate=0.005)
+            N_z.train(6, train_z, yz[:,j], learning_rate=0.005)
 
-            print("initial cond: ", r0)
             j += 1
+            print(j, " of ", cw_problems, " initial cond: ", r0)
 
     # end_train = time.time()
-    print('Testing network')
     predictions.append(N.predict(train))
     predictions_y.append(N_y.predict(train_y))
     predictions_z.append(N_z.predict(train_z))
 
-    predictions_test.append(N.predict(test_set))
-    predictions_y_test.append(N_y.predict(test_sety))
-    predictions_z_test.append(N_z.predict(test_setz))
+    fig, ax = plt.subplots(1, 1)
+
+    print('Testing network')
+    i = 0
+    for r0_test in deltar0_test:
+
+        predictions_test, predictions_y_test, predictions_z_test = [], [], []
+
+        x0_test = np.ones((len(X), 1)) * r0_test[0]
+        y0_test = np.ones((len(X), 1)) * r0_test[1]
+        z0_test = np.ones((len(X), 1)) * r0_test[2]
+
+        # x0_test.shape = (-1, 1)
+        test_set = np.hstack((X, x0_test))
+        test_sety = np.hstack((X, y0_test))
+        test_setz = np.hstack((X, z0_test))
+
+        ax.plot(X, x_test[:,i], label="x test " + str(i))
+        ax.plot(X, y_test[:,i], label="y test " + str(i))
+        ax.plot(X,z_test[:,i], label="z test " + str(i))
+        ax.plot(X, np.asarray(N.predict(test_set)).flatten(), label="NN x test " + str(i))
+        ax.plot(X, np.asarray(N_y.predict(test_sety)).flatten(), label="NN y test " + str(i))
+        ax.plot(X, np.asarray(N_z.predict(test_setz)).flatten() * z_norm, label="NN z test " + str(i))
+
+        print('MSE test X: ', mean_squared_error(x_test[:,i],np.asarray(N.predict(test_set)).flatten()))
+        print('MSE test y: ', mean_squared_error(y_test[:,i],np.asarray(N_y.predict(test_sety)).flatten()))
+        print('MSE test z: ', mean_squared_error(z_test[:,i],np.asarray(N_z.predict(test_setz)).flatten()*z_norm))
+
+
+
+
+        i += 1
 
 
     # np.append(predictions,N.predict(train))
@@ -465,6 +496,7 @@ def test_regression(x_cw, xy_cw, xz_cw, delta_r0, X, y_test, deltar0_test, plots
         ax.plot(X, y_test[:, 0], label='x test', linewidth=3)
         ax.plot(X, y_test[:, 1], label='y test', linewidth=3)
         ax.plot(X, y_test[:, 2], label='z test', linewidth=3)
+
 
         ax.plot(X, np.asarray(predictions_test).flatten(), label="NN x test")
         ax.plot(X, np.asarray(predictions_y_test).flatten(), label="NN y test")
