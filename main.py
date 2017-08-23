@@ -2,19 +2,23 @@
 
 import numpy as np
 from scipy.integrate import odeint
+import pickle
+
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.metrics import mean_squared_error, r2_score, accuracy_score
 import time
 import random
 from net_demo import *
+#matplotlib.use('GTKAgg')
 
 Re = 6378
 mu = 398600
 hr_to_sec = 60 ** 2
 a = 300 + Re  # semi-major axis
 n = np.sqrt(mu / a ** 3)  # mean motion circular orbit
-cw_problems = 50
+cw_problems = 10
+cw_test_problems = 20
 def main():
     """Solving the linear CW equations given a set of state vectors
        for a target and chaser vehicle"""
@@ -30,7 +34,7 @@ def main():
 
     delta_r0_std = np.asarray(delta_r0)
     deltar0_test = [.4, .4, .2]
-    deltar0_test = [[random.random() for i in range(3)] for j in range(cw_problems)]
+    deltar0_test = [[random.random() for i in range(3)] for j in range(cw_test_problems)]
     tfinal = 2*np.pi/n*1
     time_span = np.arange(0, tfinal, 2)
 
@@ -38,9 +42,9 @@ def main():
     xy_CW = np.zeros((len(time_span), cw_problems))
     xz_CW = np.zeros((len(time_span), cw_problems))
 
-    x_test = np.zeros((len(time_span), cw_problems))
-    y_test = np.zeros((len(time_span), cw_problems))
-    z_test = np.zeros((len(time_span), cw_problems))
+    x_test = np.zeros((len(time_span), cw_test_problems))
+    y_test = np.zeros((len(time_span), cw_test_problems))
+    z_test = np.zeros((len(time_span), cw_test_problems))
 # """
 #    # Example 7.2 from Curtis
 #
@@ -390,10 +394,11 @@ def test_regression(x_cw, xy_cw, xz_cw, delta_r0, X, x_test, y_test, z_test, del
     y_norm = 150
     z_norm = 500
     # Process training data for neural network
-    X = X / (60**2)
+    X_max = X.max()
+    X = X / X_max
     X.shape = (-1, 1)
     y = x_cw
-    yy = xy_cw
+    yy = xy_cw / y_norm
     yz = xz_cw / z_norm
     x0 = np.ones((len(X), 1))
 
@@ -407,10 +412,9 @@ def test_regression(x_cw, xy_cw, xz_cw, delta_r0, X, x_test, y_test, z_test, del
 
     param = ((2, 0, 0), (12, hyp_tan, hyp_tan_prime), (12, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
 
+    param_y = ((2, 0, 0), (45, hyp_tan, hyp_tan_prime), (45, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
 
-    param_y = ((2, 0, 0), (30, logistic, logistic_prime), (30, logistic, logistic_prime), (1, identity, identity_prime))
-
-    param_z = ((2, 0, 0), (55, hyp_tan, hyp_tan_prime), (55, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
+    param_z = ((2, 0, 0), (65, hyp_tan, hyp_tan_prime), (65, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
 
     #Set learning rate.
     rates = [0.005]
@@ -437,17 +441,22 @@ def test_regression(x_cw, xy_cw, xz_cw, delta_r0, X, x_test, y_test, z_test, del
                 N_z = NeuralNetwork(train_z, yz[:,0], param_z)
 
             # start_train = time.time()
-            N.train(4, train, y[:,j], learning_rate=rate)
-            N_y.train(3, train_y, yy[:,j], learning_rate=0.005)
-            N_z.train(6, train_z, yz[:,j], learning_rate=0.005)
+            # N.train(5, train, y[:,j], learning_rate=rate)
+            N_y.train(6, train_y, yy[:,j], learning_rate=0.009)
+            # N_z.train(5, train_z, yz[:,j], learning_rate=0.005)
+
+            # print('MSE train X: ', mean_squared_error(y[:,j],np.asarray(N.predict(train)).flatten()))
+            print('MSE train y: ', mean_squared_error(yy[:, j], np.asarray(N.predict(train_y)).flatten()))
+            # print('MSE train z: ', mean_squared_error(yz[:, j], np.asarray(N.predict(train_z)).flatten()))
 
             j += 1
             print(j, " of ", cw_problems, " initial cond: ", r0)
 
+
     # end_train = time.time()
-    predictions.append(N.predict(train))
+    # predictions.append(N.predict(train))
     predictions_y.append(N_y.predict(train_y))
-    predictions_z.append(N_z.predict(train_z))
+    # predictions_z.append(N_z.predict(train_z))
 
     fig, ax = plt.subplots(1, 1)
 
@@ -466,76 +475,95 @@ def test_regression(x_cw, xy_cw, xz_cw, delta_r0, X, x_test, y_test, z_test, del
         test_sety = np.hstack((X, y0_test))
         test_setz = np.hstack((X, z0_test))
 
-        ax.plot(X, x_test[:,i], label="x test " + str(i))
+        # ax.plot(X, x_test[:,i], label="x test " + str(i))
         ax.plot(X, y_test[:,i], label="y test " + str(i))
-        ax.plot(X,z_test[:,i], label="z test " + str(i))
-        ax.plot(X, np.asarray(N.predict(test_set)).flatten(), label="NN x test " + str(i))
-        ax.plot(X, np.asarray(N_y.predict(test_sety)).flatten(), label="NN y test " + str(i))
-        ax.plot(X, np.asarray(N_z.predict(test_setz)).flatten() * z_norm, label="NN z test " + str(i))
-
-        print('MSE test X: ', mean_squared_error(x_test[:,i],np.asarray(N.predict(test_set)).flatten()))
-        print('MSE test y: ', mean_squared_error(y_test[:,i],np.asarray(N_y.predict(test_sety)).flatten()))
-        print('MSE test z: ', mean_squared_error(z_test[:,i],np.asarray(N_z.predict(test_setz)).flatten()*z_norm))
+        # ax.plot(X,z_test[:,i], label="z test " + str(i))
+        # ax.plot(X, np.asarray(N.predict(test_set)).flatten(), label="NN x test " + str(i))
+        ax.plot(X, np.asarray(N_y.predict(test_sety)).flatten() * y_norm, label="NN y test " + str(i))
+        # ax.plot(X, np.asarray(N_z.predict(test_setz)).flatten() * z_norm, label="NN z test " + str(i))
 
 
+        # print('MSE test X: ', mean_squared_error(x_test[:,i],np.asarray(N.predict(test_set)).flatten()))
+        print('MSE test y: ', mean_squared_error(y_test[:,i], np.asarray(N_y.predict(test_sety)).flatten() * y_norm))
+        # print('MSE test z: ', mean_squared_error(z_test[:,i],np.asarray(N_z.predict(test_setz)).flatten() * z_norm))
 
+        N_y.train(1, test_sety, y_test[:,i], learning_rate=0.009)
 
         i += 1
 
+    #Store the matplotlib file
 
+    plt.show()
+
+    pickle.dump(fig, open('FigNN.fig.pickle', 'wb'))
+
+
+    #store the NN files
+    NN_file_x = open('NN_x.pkl', 'w')
+    pickle.dump(N, NN_file_x)
+    NN_file_x.close()
+
+    NN_file_y = open('NN_y.pkl', 'w')
+    pickle.dump(N_y, NN_file_y)
+    NN_file_y.close()
+
+    NN_file_z = open('NN_z.pkl', 'w')
+    pickle.dump(N_z, NN_file_z)
+    NN_file_z.close()
+    pass
     # np.append(predictions,N.predict(train))
     # plt.figure(4)
-    if plots:
-        fig, ax = plt.subplots(1, 1)
-        # ax.plot(X, y[:,0], label='x value', linewidth=2, color='black')
-        # ax.plot(X, y[:,1], label='y value', linewidth=2, color='red')
-        # ax.plot(X,y[:,2], label='z value', linewidth=2, color='blue')
-        # ax.plot(X,np.asarray(predictions).flatten(), label="NN x")
-        # ax.plot(X,np.asarray(predictions_y).flatten(), label="NN y")
-        # ax.plot(X,np.asarray(predictions_z).flatten(), label="NN z")
-        ax.plot(X, y_test[:, 0], label='x test', linewidth=3)
-        ax.plot(X, y_test[:, 1], label='y test', linewidth=3)
-        ax.plot(X, y_test[:, 2], label='z test', linewidth=3)
-
-
-        ax.plot(X, np.asarray(predictions_test).flatten(), label="NN x test")
-        ax.plot(X, np.asarray(predictions_y_test).flatten(), label="NN y test")
-        ax.plot(X, np.asarray(predictions_z_test).flatten()*z_norm, label="NN z test")
-
-        # for data in predictions:
-        #     ax.plot(X, data[1], label="NN x "+str(rate))
-            # np.append(mse_test, data[1])
-        # for data in predictions_y:
-        #     ax.plot(X, data[1], label='NN y set')
-        # for data in predictions_z:
-        #     ax.plot(X, data[1], label='NN z set')
-
-        ax.legend()
-        plt.xlabel('Time (hr)')
-        plt.ylabel('Position (km)')
-
-        print('---Training---')
-        print('MSE training X: ', mean_squared_error(y[:,0], np.asarray(predictions).flatten()))
-        print('r2 training X: ', r2_score(y[:,0], np.asarray(predictions).flatten()))
-
-        print('MSE training Y: ', mean_squared_error(yy[:,0], np.asarray(predictions_y).flatten()))
-        print('r2 training Y: ', r2_score(yy[:,1], np.asarray(predictions_y).flatten()))
-
-        print('MSE training Z: ', mean_squared_error(yz[:,0], np.asarray(predictions_z).flatten()))
-        print('r2 training Z: ', r2_score(yz[:,2], np.asarray(predictions_z).flatten()))
-
-
-        print('---Testing---')
-        print('MSE test X: ', mean_squared_error(y_test[:,0], np.asarray(predictions_test).flatten()))
-        # print('r2 test X: ', r2_score(y_test[:,0], np.asarray(predictions_test).flatten()))
-
-        print('MSE test Y: ', mean_squared_error(y_test[:,1], np.asarray(predictions_y_test).flatten()))
-        print('MSE test z: ', mean_squared_error(y_test[:,2], np.asarray(predictions_z_test).flatten()*z_norm))
-
-        # print(mean_squared_error(y[:,1], np.asarray(predictions_z).flatten())
-        plt.show()
-
-        pass
+    # if plots:
+    #     fig, ax = plt.subplots(1, 1)
+    #     # ax.plot(X, y[:,0], label='x value', linewidth=2, color='black')
+    #     # ax.plot(X, y[:,1], label='y value', linewidth=2, color='red')
+    #     # ax.plot(X,y[:,2], label='z value', linewidth=2, color='blue')
+    #     # ax.plot(X,np.asarray(predictions).flatten(), label="NN x")
+    #     # ax.plot(X,np.asarray(predictions_y).flatten(), label="NN y")
+    #     # ax.plot(X,np.asarray(predictions_z).flatten(), label="NN z")
+    #     ax.plot(X, y_test[:, 0], label='x test', linewidth=3)
+    #     ax.plot(X, y_test[:, 1], label='y test', linewidth=3)
+    #     ax.plot(X, y_test[:, 2], label='z test', linewidth=3)
+    #
+    #
+    #     ax.plot(X, np.asarray(predictions_test).flatten(), label="NN x test")
+    #     ax.plot(X, np.asarray(predictions_y_test).flatten(), label="NN y test")
+    #     ax.plot(X, np.asarray(predictions_z_test).flatten()*z_norm, label="NN z test")
+    #
+    #     # for data in predictions:
+    #     #     ax.plot(X, data[1], label="NN x "+str(rate))
+    #         # np.append(mse_test, data[1])
+    #     # for data in predictions_y:
+    #     #     ax.plot(X, data[1], label='NN y set')
+    #     # for data in predictions_z:
+    #     #     ax.plot(X, data[1], label='NN z set')
+    #
+    #     ax.legend()
+    #     plt.xlabel('Time (hr)')
+    #     plt.ylabel('Position (km)')
+    #
+    #     print('---Training---')
+    #     print('MSE training X: ', mean_squared_error(y[:,0], np.asarray(predictions).flatten()))
+    #     print('r2 training X: ', r2_score(y[:,0], np.asarray(predictions).flatten()))
+    #
+    #     print('MSE training Y: ', mean_squared_error(yy[:,0], np.asarray(predictions_y).flatten()))
+    #     print('r2 training Y: ', r2_score(yy[:,1], np.asarray(predictions_y).flatten()))
+    #
+    #     print('MSE training Z: ', mean_squared_error(yz[:,0], np.asarray(predictions_z).flatten()))
+    #     print('r2 training Z: ', r2_score(yz[:,2], np.asarray(predictions_z).flatten()))
+    #
+    #
+    #     print('---Testing---')
+    #     print('MSE test X: ', mean_squared_error(y_test[:,0], np.asarray(predictions_test).flatten()))
+    #     # print('r2 test X: ', r2_score(y_test[:,0], np.asarray(predictions_test).flatten()))
+    #
+    #     print('MSE test Y: ', mean_squared_error(y_test[:,1], np.asarray(predictions_y_test).flatten()))
+    #     print('MSE test z: ', mean_squared_error(y_test[:,2], np.asarray(predictions_z_test).flatten()*z_norm))
+    #
+    #     # print(mean_squared_error(y[:,1], np.asarray(predictions_z).flatten())
+    #     plt.show()
+    #
+    #     pass
 
 
 if __name__ == '__main__':
