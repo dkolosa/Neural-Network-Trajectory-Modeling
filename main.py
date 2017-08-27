@@ -2,6 +2,7 @@
 
 import numpy as np
 from scipy.integrate import odeint
+from sklearn.neural_network import MLPRegressor
 import pickle
 
 import matplotlib.pyplot as plt
@@ -17,8 +18,8 @@ mu = 398600
 sec_to_hr = 60 ** 2
 a = 300 + Re  # semi-major axis
 n = np.sqrt(mu / a ** 3)  # mean motion circular orbit
-cw_problems = 50
-cw_test_problems = 10
+cw_problems = 100
+cw_test_problems = 20
 
 
 def main():
@@ -405,8 +406,8 @@ def test_regression(x_cw, xy_cw, xz_cw, delta_r0, X, x_test, y_test, z_test, del
     X = X / (60 ** 2)
     X.shape = (-1, 1)
     y = x_cw
-    yy = xy_cw / y_norm
-    yz = xz_cw / z_norm
+    yy = xy_cw
+    yz = xz_cw
     x0 = np.ones((len(X), 1))
 
 
@@ -417,7 +418,7 @@ def test_regression(x_cw, xy_cw, xz_cw, delta_r0, X, x_test, y_test, z_test, del
     # param = ((1, 0, 0), (40, hyp_tan, hyp_tan_prime), (40, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
     # param = ((3, 0, 0), (43, hyp_tan, hyp_tan_prime), (43, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
 
-    param = ((3, 0, 0), (50, hyp_tan, hyp_tan_prime), (50, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
+    param = ((3, 0, 0), (50, hyp_tan, hyp_tan_prime), (50, hyp_tan, hyp_tan_prime), (2, identity, identity_prime))
 
     param_y = ((3, 0, 0), (30, hyp_tan, hyp_tan_prime), (30, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
 
@@ -433,6 +434,7 @@ def test_regression(x_cw, xy_cw, xz_cw, delta_r0, X, x_test, y_test, z_test, del
     # mse_test = np.empty(len(X))
 
     fig_train, ax_train = plt.subplots(1, 1)
+    xyMLP = MLPRegressor(hidden_layer_sizes=(100, 100), activation='tanh', solver='adam')
 
     j=0
     for rate in rates:
@@ -446,22 +448,42 @@ def test_regression(x_cw, xy_cw, xz_cw, delta_r0, X, x_test, y_test, z_test, del
             train_y = np.hstack((X,  x0 * r0[1], x0 * r0[0]))
             train_z = np.hstack((X, x0 * r0[2]))
 
+            x_train =  y[:,j]
+            y_train =  yy[:,j]
+            z_train = yz[:,j]
+
+            x_train.shape = (-1,1)
+            y_train.shape = (-1,1)
+            z_train.shape = (-1,1)
+
+            train_xy = np.hstack((x_train, y_train))
+
             if j == 0:  # Set up for the 1st time
+                Nxy = NeuralNetwork(train, train_xy, param)
                 # N=NeuralNetwork(train, y[:,0], param)
-                N_y = NeuralNetwork(train_y, yy[:,0], param_y)
+                # N_y = NeuralNetwork(train_y, yy[:,0], param_y)
                 # N_z = NeuralNetwork(train_z, yz[:,0], param_z)
 
-            N_y = NeuralNetwork(train_y, yy[:,0], param_y)
+            # N_y = NeuralNetwork(train_y, yy[:,0], param_y)
 
             # start_train = time.time()
             # while True:
             # N.train(3, train, y[:,j], learning_rate=0.001)
-            N_y.train(4, train_y, yy[:,j], learning_rate=rate)
+            # N_y.train(4, train_y, yy[:,j], learning_rate=rate)
             # N_z.train(5, train_z, yz[:,j], learning_rate=0.005)
 
+            # Nxy.train(2, train, train_xy, learning_rate=0.005)
+            n = xyMLP.fit(train, train_xy)
+
+            # xytest = np.zeros((len(X), 2))
+            # Nxy.predict(train)
+            # ax_train.plot(X,Nxy.predict(train)[:,0], X, Nxy.predict(train)[:,1])
             # print("MSE train X: {0:.5f}".format(mean_squared_error(y[:,j],np.asarray(N.predict(train)).flatten())))
-            print("MSE train y: {0:.5f}".format(mean_squared_error(yy[:, j], np.asarray(N_y.predict(train_y)).flatten())))
+            # print("MSE train y: {0:.5f}".format(mean_squared_error(yy[:, j], np.asarray(N_y.predict(train_y)).flatten())))
             # print("MSE train z: {0:.5f}".format(mean_squared_error(yz[:, j], np.asarray(N_z.predict(train_z)).flatten())))
+            # print("MSE train xy: {0:.5f}".format(mean_squared_error(yy[:, j], np.asarray(N_y.predict(train_y)).flatten())))
+
+
 
             # if j == cw_problems-1:
             #     ax_train.plot(X, np.asarray(N_y.predict(train_y)).flatten(), label="NN y " + str(rate))
@@ -500,24 +522,33 @@ def test_regression(x_cw, xy_cw, xz_cw, delta_r0, X, x_test, y_test, z_test, del
         test_sety = np.hstack((X, y0_test, x0_test))
         test_setz = np.hstack((X, z0_test))
 
+        testMPL = xyMLP.predict(test_set)
 
         # out_x = np.asarray(N.predict(test_set)).flatten()
-        out_y = np.asarray(N_y.predict(test_sety)).flatten() * y_norm
+        # out_y = np.asarray(N_y.predict(test_sety)).flatten() * y_norm
         # out_z = np.asarray(N_z.predict(test_setz)).flatten() * z_norm
 
-        # ax.plot(X, x_test[:,i], label="x test " + str(i))
+        ax.plot(X, x_test[:,i], label="x test " + str(i))
         ax.plot(X, y_test[:,i], label="y test " + str(i))
         # ax.plot(X, z_test[:,i], label="z test " + str(i))
 
+        ax.plot(X, testMPL[:,0], label='NN x',linestyle='-.')
+        ax.plot(X, testMPL[:,1], label='NN y',linestyle='-.')
+        # ax.plot(X, testMPL[:,2], label='NN z',linestyle='-.')
         # ax.plot(X, out_x, label="NN x test " + str(i), linestyle='-.')
-        ax.plot(X, out_y, label="NN y test " + str(i), linestyle='dotted')
+        # ax.plot(X, out_y, label="NN y test " + str(i), linestyle='dotted')
         # ax.plot(X, out_z, label="NN z test " + str(i), linestyle='dashed')
 
         print('Initial conditions (test): ', r0_test)
         # print("MSE test X: {0:.5f}".format(mean_squared_error(x_test[:,i], out_x)))
-        print("MSE test y: {0:.5f}".format(mean_squared_error(y_test[:,i], out_y)))
+        # print("MSE test y: {0:.5f}".format(mean_squared_error(y_test[:,i], out_y)))
         # print("MSE test z: {0:.5f}".format(mean_squared_error(z_test[:,i],out_z)))
-        # print('r2 test Z: ', r2_score(z_test[:, i], out_z))
+        # mean_squared_error(x_test[:, i].reshape((-1, 1)), testMPL[:, 0])
+        print("MSE test X: {0:.5f}".format(mean_squared_error(x_test[:, i].reshape((-1, 1)), testMPL[:, 0])))
+        print("MSE test y: {0:.5f}".format(mean_squared_error(y_test[:, i].reshape((-1, 1)), testMPL[:, 1])))
+
+        # print('x accuracy: ', xyMLP.score(testMPL[:,0].reshape((-1,1)), x_test[:,i]))
+        # print('y accuracy: ', xyMLP.score(testMPL[:,1].reshape((-1,1)), y_test[:,i]))
 
         i += 1
 

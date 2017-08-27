@@ -70,7 +70,7 @@ class NeuralNetwork(object):
         n=self.n_layers-2
         for i in range(n,0,-1):
             self.errors[i] = self.fprimes[i](self.inputs[i])*self.weights[i].T.dot(self.errors[i+1])
-            self.weights[i] = self.weights[i]-self.learning_rate*np.outer(self.errors[i+1],self.outputs[i])
+            self.weights[i] = self.weights[i]-self.learning_rate*np.dot(self.errors[i+1],self.outputs[i].T)
             self.biases[i] = self.biases[i] - self.learning_rate*self.errors[i+1]
         self.weights[0] = self.weights[0]-self.learning_rate*np.outer(self.errors[1],self.outputs[0])
         self.biases[0] = self.biases[0] - self.learning_rate*self.errors[1]
@@ -98,7 +98,7 @@ class NeuralNetwork(object):
         m = self.sizes[-1]
         ret = np.ones((n,m))
         for i in range(len(X)):
-            ret[i,:] = self.feedforward(X[i])
+            ret[i,:] = np.reshape(self.feedforward(X[i]), (1,m))
         return ret
 
 
