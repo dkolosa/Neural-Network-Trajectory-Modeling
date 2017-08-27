@@ -17,8 +17,10 @@ mu = 398600
 sec_to_hr = 60 ** 2
 a = 300 + Re  # semi-major axis
 n = np.sqrt(mu / a ** 3)  # mean motion circular orbit
-cw_problems = 200
-cw_test_problems = 50
+cw_problems = 50
+cw_test_problems = 10
+
+
 def main():
     """Solving the linear CW equations given a set of state vectors
        for a target and chaser vehicle"""
@@ -32,9 +34,11 @@ def main():
                 # [1.00, 1.00, 1.00], [.254, 0.698, 0.475], [1.0, .147, 1.0],
                 # [0.214, 0.475, 1.00], [.325, 0.469, 0.82], [0.124, 0.241, 0.658]]
 
-    delta_r0_std = np.asarray(delta_r0)
-    deltar0_test = [.4, .4, .2]
+    # delta_r0_std = np.asarray(delta_r0)
+    # deltar0_test = [.4, .4, .2]
+
     deltar0_test = [[random.random() for i in range(3)] for j in range(cw_test_problems)]
+
     tfinal = 2*np.pi/n*1
     time_span = np.arange(0, tfinal, 2)
 
@@ -234,7 +238,7 @@ def diffCW(time_span, a, n, delta_r0):
 
     # Chaser
     # delta_r0 = [0.0, 0.0, 0.0]
-    delta_v0 = [0, -0.01, .56]
+    delta_v0 = [0, -0.01, 0.56]
     # delta_r0 = [1.2, 2.3, 1.26]
     # delta_v0 = [0.31667, 0.11199, 1.247]
     delta_y0 = delta_r0 + delta_v0
@@ -242,7 +246,7 @@ def diffCW(time_span, a, n, delta_r0):
     y_rel = odeint(CW_ode, delta_y0, time_span, args=(n,),
                    atol=abserr, rtol=relerr)
 
-    # target
+    # # target
     x0 = [a, 0, 0]
     v0 = [0, np.sqrt(mu/a), 0]
     y0 = x0 + v0
@@ -263,10 +267,10 @@ def plots(time_span, y_rel, y_abs):
     :return: null
     """
     plt.figure(1)
-    plt.subplot(3, 1, 1)
+    plt.subplot(1, 1, 1)
     plt.plot(time_span, y_rel[:, 0], label='x')
-    plt.plot(time_span, y_rel[:, 1], label='y')
-    plt.plot(time_span, y_rel[:, 2], label='z')
+    # plt.plot(time_span, y_rel[:, 1], label='y')
+    # plt.plot(time_span, y_rel[:, 2], label='z')
     plt.xlabel('time (s)')
     plt.ylabel('position')
     plt.legend()
@@ -394,10 +398,10 @@ def test_regression(x_cw, xy_cw, xz_cw, delta_r0, X, x_test, y_test, z_test, del
     z_max = xz_cw.max()
 
     y_norm = 200
-    z_norm = 600
+    z_norm = 500
 
     # Process training data for neural network
-    X_max = X.max()
+
     X = X / (60 ** 2)
     X.shape = (-1, 1)
     y = x_cw
@@ -413,47 +417,56 @@ def test_regression(x_cw, xy_cw, xz_cw, delta_r0, X, x_test, y_test, z_test, del
     # param = ((1, 0, 0), (40, hyp_tan, hyp_tan_prime), (40, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
     # param = ((3, 0, 0), (43, hyp_tan, hyp_tan_prime), (43, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
 
-    param = ((2, 0, 0), (15, hyp_tan, hyp_tan_prime), (15, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
+    param = ((3, 0, 0), (50, hyp_tan, hyp_tan_prime), (50, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
 
-    param_y = ((2, 0, 0), (25, hyp_tan, hyp_tan_prime), (25, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
+    param_y = ((3, 0, 0), (30, hyp_tan, hyp_tan_prime), (30, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
 
-    param_z = ((2, 0, 0), (50, hyp_tan, hyp_tan_prime), (50, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
+    param_z = ((2, 0, 0), (20, hyp_tan, hyp_tan_prime), (20, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
 
     #Set learning rate.
-    rates = [0.005]
+    rates = [0.05]
     predictions = []
     predictions_y = []
     predictions_z = []
     predictions_test, predictions_y_test, predictions_z_test = [], [], []
 
     # mse_test = np.empty(len(X))
+
+    fig_train, ax_train = plt.subplots(1, 1)
+
     j=0
     for rate in rates:
         epochs = 5
+        j = 0
         for r0 in delta_r0:
             # train_input = x0[:, j] * r0
             # train_input.shape = (-1,1)
             # train = np.column_stack((X, x0 * delta_r0[0], x0 * delta_r0[1]))
-            train = np.hstack((X,  x0 * r0[0]))
-            train_y = np.hstack((X,  x0 * r0[1]))
+            train = np.hstack((X,  x0 * r0[0], x0 * r0[1]))
+            train_y = np.hstack((X,  x0 * r0[1], x0 * r0[0]))
             train_z = np.hstack((X, x0 * r0[2]))
 
             if j == 0:  # Set up for the 1st time
-                N=NeuralNetwork(train, y[:,0], param)
+                # N=NeuralNetwork(train, y[:,0], param)
                 N_y = NeuralNetwork(train_y, yy[:,0], param_y)
-                N_z = NeuralNetwork(train_z, yz[:,0], param_z)
+                # N_z = NeuralNetwork(train_z, yz[:,0], param_z)
+
+            N_y = NeuralNetwork(train_y, yy[:,0], param_y)
 
             # start_train = time.time()
             # while True:
-            N.train(3, train, y[:,j], learning_rate=0.001)
-            N_y.train(3, train_y, yy[:,j], learning_rate=0.05)
-            N_z.train(2, train_z, yz[:,j], learning_rate=0.001)
+            # N.train(3, train, y[:,j], learning_rate=0.001)
+            N_y.train(4, train_y, yy[:,j], learning_rate=rate)
+            # N_z.train(5, train_z, yz[:,j], learning_rate=0.005)
 
-            print('MSE train X: ', mean_squared_error(y[:,j],np.asarray(N.predict(train)).flatten()))
-            print('MSE train y: ', mean_squared_error(yy[:, j], np.asarray(N_y.predict(train_y)).flatten()))
-            print('MSE train z: ', mean_squared_error(yz[:, j], np.asarray(N_z.predict(train_z)).flatten()))
+            # print("MSE train X: {0:.5f}".format(mean_squared_error(y[:,j],np.asarray(N.predict(train)).flatten())))
+            print("MSE train y: {0:.5f}".format(mean_squared_error(yy[:, j], np.asarray(N_y.predict(train_y)).flatten())))
+            # print("MSE train z: {0:.5f}".format(mean_squared_error(yz[:, j], np.asarray(N_z.predict(train_z)).flatten())))
 
-            print('r2 training Z: ', r2_score(yz[:, j], np.asarray(N_z.predict(train_z)).flatten()))
+            # if j == cw_problems-1:
+            #     ax_train.plot(X, np.asarray(N_y.predict(train_y)).flatten(), label="NN y " + str(rate))
+                # plt.show()
+            # print('r2 training Z: ', r2_score(yz[:, j], np.asarray(N_z.predict(train_z)).flatten()))
 
                 # if (mean_squared_error(yz[:, j], np.asarray(N.predict(train_z)).flatten()) < 1.0):
                 #     break
@@ -483,53 +496,43 @@ def test_regression(x_cw, xy_cw, xz_cw, delta_r0, X, x_test, y_test, z_test, del
         out_y = np.zeros(len(X))
         out_z = np.zeros(len(X))
 
-        test_set = np.hstack((X, x0_test))
-        test_sety = np.hstack((X, y0_test))
+        test_set = np.hstack((X, x0_test, y0_test))
+        test_sety = np.hstack((X, y0_test, x0_test))
         test_setz = np.hstack((X, z0_test))
 
 
-        out_x = np.asarray(N.predict(test_set)).flatten()
+        # out_x = np.asarray(N.predict(test_set)).flatten()
         out_y = np.asarray(N_y.predict(test_sety)).flatten() * y_norm
-        out_z = np.asarray(N_z.predict(test_setz)).flatten()*z_norm
+        # out_z = np.asarray(N_z.predict(test_setz)).flatten() * z_norm
 
-        ax.plot(X, x_test[:,i], label="x test " + str(i))
+        # ax.plot(X, x_test[:,i], label="x test " + str(i))
         ax.plot(X, y_test[:,i], label="y test " + str(i))
-        ax.plot(X, z_test[:,i], label="z test " + str(i))
+        # ax.plot(X, z_test[:,i], label="z test " + str(i))
 
-        ax.plot(X, out_x, label="NN x test " + str(i))
-        ax.plot(X, out_y , label="NN y test " + str(i))
-        ax.plot(X, out_z, label="NN z test " + str(i))
+        # ax.plot(X, out_x, label="NN x test " + str(i), linestyle='-.')
+        ax.plot(X, out_y, label="NN y test " + str(i), linestyle='dotted')
+        # ax.plot(X, out_z, label="NN z test " + str(i), linestyle='dashed')
 
         print('Initial conditions (test): ', r0_test)
-        print('MSE test X: ', mean_squared_error(x_test[:,i], out_x))
-        print('MSE test y: ', mean_squared_error(y_test[:,i], out_y))
-        print('MSE test z: ', mean_squared_error(z_test[:,i],out_z))
-        print('r2 test Z: ', r2_score(z_test[:, i], out_z))
-
-        # N.train(2, test_set, x_test[:, i], learning_rate=0.005)
-        # N_y.train(2, test_sety, y_test[:,i], learning_rate=0.005)
-        # N_z.train(4, test_setz, z_test[:, i], learning_rate=0.02)
+        # print("MSE test X: {0:.5f}".format(mean_squared_error(x_test[:,i], out_x)))
+        print("MSE test y: {0:.5f}".format(mean_squared_error(y_test[:,i], out_y)))
+        # print("MSE test z: {0:.5f}".format(mean_squared_error(z_test[:,i],out_z)))
+        # print('r2 test Z: ', r2_score(z_test[:, i], out_z))
 
         i += 1
 
     #Store the matplotlib file
 
     plt.show()
-
+    pass
     pickle.dump(fig, open('FigNN.fig.pickle', 'wb'))
 
 
     #store the NN files
-    # NN_file_x = open('NN_x.pkl', 'w')
-    pickle.dump(N, open('NN_x.pkl', 'w'))
-    NN_file_x.close()
+    pickle.dump(N, open('NN_x_model.pkl', 'wb'))
+    pickle.dump(N_y, open('NN_y_model.pkl', 'wb'))
+    pickle.dump(N_z, open('NN_z_model.pkl', 'wb'))
 
-    pickle.dump(N_y, open('NN_y.pkl', 'w'))
-    NN_file_y.close()
-
-    # NN_file_z = open('NN_z.pkl', 'w')
-    pickle.dump(N_z, open('NN_z.pkl', 'w'))
-    NN_file_z.close()
     pass
     # np.append(predictions,N.predict(train))
     # plt.figure(4)
