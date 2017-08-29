@@ -18,8 +18,8 @@ mu = 398600
 sec_to_hr = 60 ** 2
 a = 300 + Re  # semi-major axis
 n = np.sqrt(mu / a ** 3)  # mean motion circular orbit
-cw_problems = 200
-cw_test_problems = 50
+cw_problems = 10
+cw_test_problems = 5
 
 
 def main():
@@ -208,7 +208,12 @@ def cw_Linear():
 
 
 def save_data(file, data):
-    """Save the file contents"""
+    """
+    Save the file contents
+    :param file: name of the file to save to
+    :param data: the object or data to save
+    """
+
     with open(file, 'ab') as data_file:
         np.savetxt(data_file, data, delimiter=',')
 
@@ -399,7 +404,7 @@ def test_regression(x_cw, xy_cw, xz_cw, delta_r0, X, x_test, y_test, z_test, del
     z_max = xz_cw.max()
 
     y_norm = 200
-    z_norm = 300
+    z_norm = 500
 
     # Process training data for neural network
 
@@ -422,7 +427,7 @@ def test_regression(x_cw, xy_cw, xz_cw, delta_r0, X, x_test, y_test, z_test, del
 
     param_y = ((5, 0, 0), (30, hyp_tan, hyp_tan_prime), (30, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
 
-    param_z = ((3, 0, 0), (60, hyp_tan, hyp_tan_prime), (60, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
+    param_z = ((3, 0, 0), (50, hyp_tan, hyp_tan_prime), (50, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
 
     #Set learning rate.
     rates = [0.05]
@@ -468,20 +473,19 @@ def test_regression(x_cw, xy_cw, xz_cw, delta_r0, X, x_test, y_test, z_test, del
             # start_train = time.time()
             # while True:
             N.train(3, train, y[:,j], learning_rate=0.001)
-            N_y.train(4, train_y, yy[:,j], learning_rate=rate)
-            N_z.train(4, train_z, yz[:,j], learning_rate=0.001)
+            N_y.train(4, train_y, yy[:,j], learning_rate=0.05)
+            N_z.train(3, train_z, yz[:,j], learning_rate=0.03)
 
             # n = xyMLP.fit(train, train_xy)
 
+            print(j+1, " of ", cw_problems, " initial cond: [{0:.3f}, {1:.3f}, {2:.3f}]".format(r0[0], r0[1], r0[2]))
             print("MSE train X: {0:.5f}".format(mean_squared_error(y[:,j], np.asarray(N.predict(train)).flatten())))
             print("MSE train y: {0:.5f}".format(mean_squared_error(yy[:, j], np.asarray(N_y.predict(train_y)).flatten())))
-            print("MSE train z: {0:.5f}".format(mean_squared_error(yz[:, j], np.asarray(N_z.predict(train_z)).flatten())))
+            print("MSE train z: {0:.5f} \n".format(mean_squared_error(yz[:, j], np.asarray(N_z.predict(train_z)).flatten())))
 
             # print('r2 training Z: ', r2_score(yz[:, j], np.asarray(N_z.predict(train_z)).flatten()))
 
             j += 1
-            print(j, " of ", cw_problems, " initial cond: ", r0)
-
 
     # end_train = time.time()
     # predictions.append(N.predict(train))
@@ -521,14 +525,16 @@ def test_regression(x_cw, xy_cw, xz_cw, delta_r0, X, x_test, y_test, z_test, del
         ax.plot(X, out_y, label="NN y test " + str(i), linestyle='dotted')
         ax.plot(X, out_z, label="NN z test " + str(i), linestyle='dashed')
 
-        print('Initial conditions (test): ', r0_test)
+        # print('Initial conditions (test): ', r0_test)
+        print(i+1, " of ", cw_test_problems, " initial cond: [{0:.3f}, {1:.3f}, {2:.3f}]".format(r0_test[0], r0_test[1], r0_test[2]))
+
         print("MSE test X: {0:.5f}".format(mean_squared_error(x_test[:,i], out_x)))
         print("MSE test y: {0:.5f}".format(mean_squared_error(y_test[:,i], out_y)))
         print("MSE test z: {0:.5f}".format(mean_squared_error(z_test[:,i],out_z)))
 
         print('r2 test X: ', r2_score(x_test[:, i], out_x))
         print('r2 test y: ', r2_score(y_test[:, i], out_y))
-        print('r2 test z: ', r2_score(z_test[:, i], out_z))
+        print('r2 test z: ', r2_score(z_test[:, i], out_z), "\n")
 
         # mean_squared_error(x_test[:, i].reshape((-1, 1)), testMPL[:, 0])
         # print("MSE test X: {0:.5f}".format(mean_squared_error(x_test[:, i].reshape((-1, 1)), testMPL[:, 0])))
@@ -543,10 +549,23 @@ def test_regression(x_cw, xy_cw, xz_cw, delta_r0, X, x_test, y_test, z_test, del
     pickle.dump(fig, open('FigNN.fig.pickle', 'wb'))
 
 
-    #store the NN files
+    # save the NN state
     pickle.dump(N, open('NN_x_model.pkl', 'wb'))
     pickle.dump(N_y, open('NN_y_model.pkl', 'wb'))
     pickle.dump(N_z, open('NN_z_model.pkl', 'wb'))
+
+    # save the training and test inital conditions
+    save_data('training_ini.csv', delta_r0)
+    save_data('test_ini.csv', deltar0_test)
+
+    # save the output training and test data
+    save_data('train_outx.csv', x_cw)
+    save_data('train_outy.csv', xy_cw)
+    save_data('train_outz.csv', xz_cw)
+
+    save_data('test_outx.csv', x_test)
+    save_data('test_outy.csv', y_test)
+    save_data('test_outz.csv', z_test)
 
     pass
     # np.append(predictions,N.predict(train))
