@@ -18,8 +18,8 @@ mu = 398600
 sec_to_hr = 60 ** 2
 a = 300 + Re  # semi-major axis
 n = np.sqrt(mu / a ** 3)  # mean motion circular orbit
-cw_problems = 10
-cw_test_problems = 5
+cw_problems = 100
+cw_test_problems = 6
 
 
 def main():
@@ -28,17 +28,17 @@ def main():
 
     # delta_r0 = [.5,0,.2]
     delta_r0 = [[random.random() for i in range(3)] for j in range(cw_problems)]
-    # delta_r0 = [[0.0, 0.0, 0.0], [.80, 0.30, 0.40], [0.10, 0.20, 0.10]]
-                # [0.30, 0.80, 0.90], [.50, 0.70, 0.90], [0.60, 0.30, 0.20],
-                # [0.1, 0.40, 0.70], [.450, 0.20, 0.40], [1.0, 0.30, 0.20],
-                # [0.41, 0.47, 1.00], [.87, 0.70, 0.82], [0.00, 1.00, 0.41],
-                # [1.00, 1.00, 1.00], [.254, 0.698, 0.475], [1.0, .147, 1.0],
-                # [0.214, 0.475, 1.00], [.325, 0.469, 0.82], [0.124, 0.241, 0.658]]
+    # delta_r0 = [[0.197, 0.145, 0.110], [0.574, 0.522, 0.648], [0.548, 0.375, 0.815],
+    #             [0.836, 0.082, 0.260], [0.352, 0.867, 0.882], [0.866, 0.674, 0.558]]
+
 
     # delta_r0_std = np.asarray(delta_r0)
     # deltar0_test = [.4, .4, .2]
 
-    deltar0_test = [[random.random() for i in range(3)] for j in range(cw_test_problems)]
+    # deltar0_test = [[random.random() for i in range(3)] for j in range(cw_test_problems)]
+
+    deltar0_test = [[0.197, 0.145, 0.110], [0.574, 0.522, 0.648], [0.548, 0.375, 0.815],
+                    [0.836, 0.082, 0.260], [0.352, 0.867, 0.882], [0.866, 0.674, 0.558]]
 
     tfinal = 2*np.pi/n*1
     time_span = np.arange(0, tfinal, 2)
@@ -423,11 +423,11 @@ def test_regression(x_cw, xy_cw, xz_cw, delta_r0, X, x_test, y_test, z_test, del
     # param = ((1, 0, 0), (40, hyp_tan, hyp_tan_prime), (40, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
     # param = ((3, 0, 0), (43, hyp_tan, hyp_tan_prime), (43, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
 
-    param = ((5, 0, 0), (50, hyp_tan, hyp_tan_prime), (50, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
+    param = ((5, 0, 0), (20, hyp_tan, hyp_tan_prime), (20, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
 
-    param_y = ((5, 0, 0), (30, hyp_tan, hyp_tan_prime), (30, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
+    param_y = ((5, 0, 0), (35, hyp_tan, hyp_tan_prime), (35, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
 
-    param_z = ((3, 0, 0), (50, hyp_tan, hyp_tan_prime), (50, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
+    param_z = ((3, 0, 0), (45, hyp_tan, hyp_tan_prime), (45, hyp_tan, hyp_tan_prime), (1, identity, identity_prime))
 
     #Set learning rate.
     rates = [0.05]
@@ -474,7 +474,7 @@ def test_regression(x_cw, xy_cw, xz_cw, delta_r0, X, x_test, y_test, z_test, del
             # while True:
             N.train(3, train, y[:,j], learning_rate=0.001)
             N_y.train(4, train_y, yy[:,j], learning_rate=0.05)
-            N_z.train(3, train_z, yz[:,j], learning_rate=0.03)
+            N_z.train(5, train_z, yz[:,j], learning_rate=0.03)
 
             # n = xyMLP.fit(train, train_xy)
 
@@ -493,6 +493,11 @@ def test_regression(x_cw, xy_cw, xz_cw, delta_r0, X, x_test, y_test, z_test, del
     # predictions_z.append(N_z.predict(train_z))
 
     fig, ax = plt.subplots(1, 1)
+
+    # fig, (ax_x, ax_y, ax_z) = plt.subplots(3, sharex=True)
+    # ax_x = plt.subplot((2,2,1))
+    # ax_y = plt.subplot((2,2,2))
+    # ax_z = plt.subplot((2,2,3))
 
     print('Testing network')
     i = 0
@@ -514,6 +519,10 @@ def test_regression(x_cw, xy_cw, xz_cw, delta_r0, X, x_test, y_test, z_test, del
         out_y = np.asarray(N_y.predict(test_sety)).flatten() * y_norm
         out_z = np.asarray(N_z.predict(test_setz)).flatten() * z_norm
 
+        # ax_x.plot(X, x_test[:,i], label="x test " + str(i))
+        # ax_y.plot(X, y_test[:,i], label="y test " + str(i))
+        # ax_z.plot(X, z_test[:,i], label="z test " + str(i))
+
         ax.plot(X, x_test[:,i], label="x test " + str(i))
         ax.plot(X, y_test[:,i], label="y test " + str(i))
         ax.plot(X, z_test[:,i], label="z test " + str(i))
@@ -521,6 +530,10 @@ def test_regression(x_cw, xy_cw, xz_cw, delta_r0, X, x_test, y_test, z_test, del
         # ax.plot(X, testMPL[:,0], label='NN x',linestyle='-.')
         # ax.plot(X, testMPL[:,1], label='NN y',linestyle='-.')
         # ax.plot(X, testMPL[:,2], label='NN z',linestyle='-.')
+        # ax_x.plot(X, out_x, label="NN x test " + str(i), linestyle='-.')
+        # ax_y.plot(X, out_y, label="NN y test " + str(i), linestyle='dotted')
+        # ax_z.plot(X, out_z, label="NN z test " + str(i), linestyle='dashed')
+
         ax.plot(X, out_x, label="NN x test " + str(i), linestyle='-.')
         ax.plot(X, out_y, label="NN y test " + str(i), linestyle='dotted')
         ax.plot(X, out_z, label="NN z test " + str(i), linestyle='dashed')
@@ -543,11 +556,12 @@ def test_regression(x_cw, xy_cw, xz_cw, delta_r0, X, x_test, y_test, z_test, del
         i += 1
 
     #Store the matplotlib file
-
+    plt.xlabel('time (hr)')
+    plt.ylabel('position (km)')
+    plt.title('Neural Network test output')
+    pickle.dump(fig, open('FigNN_final4.fig.pkl', 'wb'))
     plt.show()
     pass
-    pickle.dump(fig, open('FigNN.fig.pickle', 'wb'))
-
 
     # save the NN state
     pickle.dump(N, open('NN_x_model.pkl', 'wb'))
