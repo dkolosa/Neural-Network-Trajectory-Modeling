@@ -1,0 +1,1412 @@
+/home/dan/anaconda3/bin/python3.6 /opt/pycharm-professional/helpers/pydev/pydevd.py --multiproc --qt-support=auto --client 127.0.0.1 --port 39993 --file /home/dan/PycharmProjects/ClohessyWiltshire/main.py
+pydev debugger: process 3050 is connecting
+
+Connected to pydev debugger (build 172.3757.67)
+Generating training data
+
+Generated training data
+
+Generated test data
+ Beginning training...
+1  of  200  initial cond: [0.628, 0.946, 0.904]
+MSE train X: 0.02024
+MSE train y: 0.00258
+MSE train z: 0.01867 
+
+2  of  200  initial cond: [0.454, 0.430, 0.083]
+MSE train X: 12.04934
+MSE train y: 0.00019
+MSE train z: 0.02373 
+
+3  of  200  initial cond: [0.725, 0.790, 0.568]
+MSE train X: 0.41423
+MSE train y: 0.00050
+MSE train z: 0.00621 
+
+4  of  200  initial cond: [0.642, 0.823, 0.012]
+MSE train X: 0.41006
+MSE train y: 0.00007
+MSE train z: 0.02684 
+
+5  of  200  initial cond: [0.012, 0.323, 0.339]
+MSE train X: 42.89438
+MSE train y: 0.00287
+MSE train z: 0.01101 
+
+6  of  200  initial cond: [0.693, 0.664, 0.127]
+MSE train X: 1.88179
+MSE train y: 0.00027
+MSE train z: 0.02308 
+
+7  of  200  initial cond: [0.949, 0.244, 0.793]
+MSE train X: 9.46218
+MSE train y: 0.00150
+MSE train z: 0.00071 
+
+8  of  200  initial cond: [0.148, 0.398, 0.677]
+MSE train X: 30.52963
+MSE train y: 0.00226
+MSE train z: 0.00266 
+
+9  of  200  initial cond: [0.032, 0.001, 0.556]
+MSE train X: 68.82465
+MSE train y: 0.00281
+MSE train z: 0.00479 
+
+10  of  200  initial cond: [0.835, 0.244, 0.129]
+MSE train X: 11.04010
+MSE train y: 0.00110
+MSE train z: 0.02387 
+
+11  of  200  initial cond: [0.183, 0.339, 0.435]
+MSE train X: 32.69646
+MSE train y: 0.00191
+MSE train z: 0.00941 
+
+12  of  200  initial cond: [0.631, 0.176, 0.053]
+MSE train X: 19.72092
+MSE train y: 0.00013
+MSE train z: 0.02870 
+
+13  of  200  initial cond: [0.770, 0.839, 0.371]
+MSE train X: 0.42096
+MSE train y: 0.00035
+MSE train z: 0.01233 
+
+14  of  200  initial cond: [0.990, 0.994, 0.156]
+MSE train X: 5.15784
+MSE train y: 0.00122
+MSE train z: 0.02329 
+
+15  of  200  initial cond: [0.454, 0.188, 0.970]
+MSE train X: 26.74469
+MSE train y: 0.00031
+MSE train z: 0.00036 
+
+16  of  200  initial cond: [0.174, 0.983, 0.001]
+MSE train X: 6.77075
+MSE train y: 0.00137
+MSE train z: 0.03244 
+
+17  of  200  initial cond: [0.602, 0.434, 0.097]
+MSE train X: 9.69565
+MSE train y: 0.00007
+MSE train z: 0.02649 
+
+18  of  200  initial cond: [0.781, 0.341, 0.333]
+MSE train X: 8.96639
+MSE train y: 0.00050
+MSE train z: 0.01425 
+
+19  of  200  initial cond: [0.117, 0.883, 0.962]
+MSE train X: 11.19526
+MSE train y: 0.00213
+MSE train z: 0.00010 
+
+20  of  200  initial cond: [0.013, 0.632, 0.908]
+MSE train X: 27.31217
+MSE train y: 0.00264
+MSE train z: 0.00004 
+
+21  of  200  initial cond: [0.306, 0.250, 0.168]
+MSE train X: 32.46600
+MSE train y: 0.00107
+MSE train z: 0.02201 
+
+22  of  200  initial cond: [0.091, 0.003, 0.495]
+MSE train X: 68.57235
+MSE train y: 0.00221
+MSE train z: 0.00774 
+
+23  of  200  initial cond: [0.980, 0.861, 0.555]
+MSE train X: 3.24628
+MSE train y: 0.00144
+MSE train z: 0.00574 
+
+24  of  200  initial cond: [0.616, 0.790, 0.252]
+MSE train X: 1.04309
+MSE train y: 0.00002
+MSE train z: 0.01793 
+
+25  of  200  initial cond: [0.155, 0.864, 0.123]
+MSE train X: 10.48629
+MSE train y: 0.00165
+MSE train z: 0.02625 
+
+26  of  200  initial cond: [0.029, 0.751, 0.676]
+MSE train X: 20.87873
+MSE train y: 0.00277
+MSE train z: 0.00225 
+
+27  of  200  initial cond: [0.641, 0.094, 0.996]
+MSE train X: 24.75703
+MSE train y: 0.00010
+MSE train z: 0.00054 
+
+28  of  200  initial cond: [0.145, 0.756, 0.240]
+MSE train X: 14.74984
+MSE train y: 0.00179
+MSE train z: 0.01975 
+
+29  of  200  initial cond: [0.038, 0.535, 0.776]
+MSE train X: 32.27587
+MSE train y: 0.00228
+MSE train z: 0.00079 
+
+30  of  200  initial cond: [0.170, 0.278, 0.742]
+MSE train X: 40.98664
+MSE train y: 0.00161
+MSE train z: 0.00148 
+
+31  of  200  initial cond: [0.079, 0.464, 0.208]
+MSE train X: 34.54961
+MSE train y: 0.00215
+MSE train z: 0.02115 
+
+32  of  200  initial cond: [0.424, 0.619, 0.663]
+MSE train X: 8.92992
+MSE train y: 0.00025
+MSE train z: 0.00272 
+
+33  of  200  initial cond: [0.817, 0.255, 0.219]
+MSE train X: 11.90016
+MSE train y: 0.00041
+MSE train z: 0.01992 
+
+34  of  200  initial cond: [0.554, 0.473, 0.154]
+MSE train X: 10.46579
+MSE train y: 0.00010
+MSE train z: 0.02466 
+
+35  of  200  initial cond: [0.950, 0.370, 0.333]
+MSE train X: 6.51271
+MSE train y: 0.00099
+MSE train z: 0.01456 
+
+36  of  200  initial cond: [0.226, 0.459, 0.764]
+MSE train X: 25.31760
+MSE train y: 0.00106
+MSE train z: 0.00110 
+
+37  of  200  initial cond: [0.958, 0.598, 0.958]
+MSE train X: 2.73645
+MSE train y: 0.00067
+MSE train z: 0.00016 
+
+38  of  200  initial cond: [0.912, 0.740, 0.527]
+MSE train X: 1.67400
+MSE train y: 0.00061
+MSE train z: 0.00741 
+
+39  of  200  initial cond: [0.609, 0.212, 0.828]
+MSE train X: 20.41557
+MSE train y: 0.00010
+MSE train z: 0.00027 
+
+40  of  200  initial cond: [0.368, 0.982, 0.139]
+MSE train X: 2.07679
+MSE train y: 0.00043
+MSE train z: 0.02479 
+
+41  of  200  initial cond: [0.537, 0.565, 0.350]
+MSE train X: 7.52826
+MSE train y: 0.00010
+MSE train z: 0.01348 
+
+42  of  200  initial cond: [0.094, 0.751, 0.351]
+MSE train X: 17.99721
+MSE train y: 0.00157
+MSE train z: 0.01336 
+
+43  of  200  initial cond: [0.355, 0.626, 0.632]
+MSE train X: 11.34385
+MSE train y: 0.00052
+MSE train z: 0.00331 
+
+44  of  200  initial cond: [0.558, 0.682, 0.256]
+MSE train X: 3.76064
+MSE train y: 0.00005
+MSE train z: 0.01842 
+
+45  of  200  initial cond: [0.261, 0.620, 0.342]
+MSE train X: 15.62235
+MSE train y: 0.00094
+MSE train z: 0.01436 
+
+46  of  200  initial cond: [0.313, 0.813, 0.505]
+MSE train X: 6.59635
+MSE train y: 0.00056
+MSE train z: 0.00794 
+
+47  of  200  initial cond: [0.417, 0.938, 0.870]
+MSE train X: 1.69802
+MSE train y: 0.00032
+MSE train z: 0.00006 
+
+48  of  200  initial cond: [0.901, 0.113, 0.769]
+MSE train X: 16.29337
+MSE train y: 0.00052
+MSE train z: 0.00098 
+
+49  of  200  initial cond: [0.328, 0.111, 0.177]
+MSE train X: 43.52706
+MSE train y: 0.00092
+MSE train z: 0.02332 
+
+50  of  200  initial cond: [0.904, 0.983, 0.251]
+MSE train X: 3.34073
+MSE train y: 0.00047
+MSE train z: 0.01892 
+
+51  of  200  initial cond: [0.404, 0.096, 0.845]
+MSE train X: 39.40605
+MSE train y: 0.00074
+MSE train z: 0.00025 
+
+52  of  200  initial cond: [0.877, 0.585, 0.519]
+MSE train X: 2.54311
+MSE train y: 0.00039
+MSE train z: 0.00711 
+
+53  of  200  initial cond: [0.883, 0.896, 0.535]
+MSE train X: 1.87648
+MSE train y: 0.00054
+MSE train z: 0.00663 
+
+54  of  200  initial cond: [0.538, 0.863, 0.856]
+MSE train X: 0.97166
+MSE train y: 0.00007
+MSE train z: 0.00017 
+
+55  of  200  initial cond: [0.456, 0.567, 0.766]
+MSE train X: 9.97590
+MSE train y: 0.00024
+MSE train z: 0.00091 
+
+56  of  200  initial cond: [0.365, 0.297, 0.509]
+MSE train X: 27.74744
+MSE train y: 0.00070
+MSE train z: 0.00741 
+
+57  of  200  initial cond: [0.422, 0.680, 0.358]
+MSE train X: 7.22035
+MSE train y: 0.00026
+MSE train z: 0.01342 
+
+58  of  200  initial cond: [0.686, 0.939, 0.637]
+MSE train X: 0.13475
+MSE train y: 0.00002
+MSE train z: 0.00330 
+
+59  of  200  initial cond: [0.348, 0.883, 0.811]
+MSE train X: 4.11095
+MSE train y: 0.00047
+MSE train z: 0.00052 
+
+60  of  200  initial cond: [0.655, 0.794, 0.635]
+MSE train X: 0.69951
+MSE train y: 0.00001
+MSE train z: 0.00378 
+
+61  of  200  initial cond: [0.362, 0.934, 0.893]
+MSE train X: 2.84669
+MSE train y: 0.00043
+MSE train z: 0.00001 
+
+62  of  200  initial cond: [0.054, 0.105, 0.389]
+MSE train X: 67.50202
+MSE train y: 0.00241
+MSE train z: 0.01215 
+
+63  of  200  initial cond: [0.346, 0.676, 0.163]
+MSE train X: 9.94519
+MSE train y: 0.00057
+MSE train z: 0.02360 
+
+64  of  200  initial cond: [0.178, 0.243, 0.015]
+MSE train X: 44.66414
+MSE train y: 0.00153
+MSE train z: 0.03295 
+
+65  of  200  initial cond: [0.808, 0.096, 0.649]
+MSE train X: 19.80444
+MSE train y: 0.00070
+MSE train z: 0.00313 
+
+66  of  200  initial cond: [0.563, 0.590, 0.092]
+MSE train X: 6.11773
+MSE train y: 0.00007
+MSE train z: 0.02821 
+
+67  of  200  initial cond: [0.673, 0.366, 0.139]
+MSE train X: 11.16393
+MSE train y: 0.00016
+MSE train z: 0.02525 
+
+68  of  200  initial cond: [0.997, 0.901, 0.535]
+MSE train X: 4.35216
+MSE train y: 0.00088
+MSE train z: 0.00682 
+
+69  of  200  initial cond: [0.165, 0.571, 0.501]
+MSE train X: 23.20140
+MSE train y: 0.00123
+MSE train z: 0.00814 
+
+70  of  200  initial cond: [0.438, 0.436, 0.797]
+MSE train X: 16.63749
+MSE train y: 0.00040
+MSE train z: 0.00062 
+
+71  of  200  initial cond: [0.468, 0.706, 0.063]
+MSE train X: 5.14795
+MSE train y: 0.00017
+MSE train z: 0.03089 
+
+72  of  200  initial cond: [0.840, 0.135, 0.522]
+MSE train X: 16.99156
+MSE train y: 0.00047
+MSE train z: 0.00719 
+
+73  of  200  initial cond: [0.815, 0.370, 0.351]
+MSE train X: 7.98093
+MSE train y: 0.00041
+MSE train z: 0.01462 
+
+74  of  200  initial cond: [0.979, 0.550, 0.445]
+MSE train X: 3.42884
+MSE train y: 0.00079
+MSE train z: 0.00995 
+
+75  of  200  initial cond: [0.717, 0.336, 0.409]
+MSE train X: 11.50829
+MSE train y: 0.00034
+MSE train z: 0.01190 
+
+76  of  200  initial cond: [0.603, 0.955, 0.146]
+MSE train X: 0.02044
+MSE train y: 0.00000
+MSE train z: 0.02525 
+
+77  of  200  initial cond: [0.661, 0.725, 0.835]
+MSE train X: 1.52754
+MSE train y: 0.00004
+MSE train z: 0.00025 
+
+78  of  200  initial cond: [0.090, 0.725, 0.836]
+MSE train X: 19.92363
+MSE train y: 0.00139
+MSE train z: 0.00026 
+
+79  of  200  initial cond: [0.814, 0.159, 0.212]
+MSE train X: 16.39222
+MSE train y: 0.00044
+MSE train z: 0.02164 
+
+80  of  200  initial cond: [0.970, 0.794, 0.492]
+MSE train X: 2.62243
+MSE train y: 0.00057
+MSE train z: 0.00822 
+
+81  of  200  initial cond: [0.215, 0.271, 0.456]
+MSE train X: 39.93165
+MSE train y: 0.00139
+MSE train z: 0.00972 
+
+82  of  200  initial cond: [0.943, 0.286, 0.694]
+MSE train X: 9.07736
+MSE train y: 0.00065
+MSE train z: 0.00196 
+
+83  of  200  initial cond: [0.587, 0.389, 0.784]
+MSE train X: 13.09441
+MSE train y: 0.00026
+MSE train z: 0.00068 
+
+84  of  200  initial cond: [0.947, 0.708, 0.326]
+MSE train X: 2.08407
+MSE train y: 0.00054
+MSE train z: 0.01591 
+
+85  of  200  initial cond: [0.368, 0.338, 0.176]
+MSE train X: 25.58883
+MSE train y: 0.00073
+MSE train z: 0.02404 
+
+86  of  200  initial cond: [0.817, 0.706, 0.448]
+MSE train X: 1.20220
+MSE train y: 0.00024
+MSE train z: 0.00932 
+
+87  of  200  initial cond: [0.927, 0.637, 0.510]
+MSE train X: 2.23366
+MSE train y: 0.00059
+MSE train z: 0.00768 
+
+88  of  200  initial cond: [0.462, 0.637, 0.918]
+MSE train X: 7.48642
+MSE train y: 0.00020
+MSE train z: 0.00003 
+
+89  of  200  initial cond: [0.870, 0.475, 0.836]
+MSE train X: 4.53828
+MSE train y: 0.00040
+MSE train z: 0.00023 
+
+90  of  200  initial cond: [0.620, 0.554, 0.369]
+MSE train X: 5.88043
+MSE train y: 0.00009
+MSE train z: 0.01381 
+
+91  of  200  initial cond: [0.922, 0.699, 0.064]
+MSE train X: 1.86885
+MSE train y: 0.00053
+MSE train z: 0.03034 
+
+92  of  200  initial cond: [0.400, 0.293, 0.568]
+MSE train X: 26.46620
+MSE train y: 0.00069
+MSE train z: 0.00572 
+
+93  of  200  initial cond: [0.456, 0.914, 0.251]
+MSE train X: 1.45461
+MSE train y: 0.00016
+MSE train z: 0.01938 
+
+94  of  200  initial cond: [0.621, 0.214, 0.552]
+MSE train X: 20.40473
+MSE train y: 0.00053
+MSE train z: 0.00632 
+
+95  of  200  initial cond: [0.801, 0.628, 0.368]
+MSE train X: 2.14517
+MSE train y: 0.00023
+MSE train z: 0.01370 
+
+96  of  200  initial cond: [0.057, 0.645, 0.930]
+MSE train X: 26.06617
+MSE train y: 0.00165
+MSE train z: 0.00002 
+
+97  of  200  initial cond: [0.897, 0.725, 0.649]
+MSE train X: 1.54095
+MSE train y: 0.00038
+MSE train z: 0.00345 
+
+98  of  200  initial cond: [0.366, 0.700, 0.582]
+MSE train X: 8.46548
+MSE train y: 0.00038
+MSE train z: 0.00533 
+
+99  of  200  initial cond: [0.281, 0.321, 0.301]
+MSE train X: 31.98423
+MSE train y: 0.00110
+MSE train z: 0.01743 
+
+100  of  200  initial cond: [0.021, 0.672, 0.934]
+MSE train X: 26.71115
+MSE train y: 0.00182
+MSE train z: 0.00005 
+
+101  of  200  initial cond: [0.676, 0.495, 0.890]
+MSE train X: 6.61090
+MSE train y: 0.00017
+MSE train z: 0.00002 
+
+102  of  200  initial cond: [0.448, 0.096, 0.915]
+MSE train X: 36.92207
+MSE train y: 0.00103
+MSE train z: 0.00002 
+
+103  of  200  initial cond: [0.287, 0.962, 0.398]
+MSE train X: 4.19953
+MSE train y: 0.00054
+MSE train z: 0.01202 
+
+104  of  200  initial cond: [0.895, 0.593, 0.246]
+MSE train X: 2.53885
+MSE train y: 0.00052
+MSE train z: 0.02052 
+
+105  of  200  initial cond: [0.681, 0.647, 0.710]
+MSE train X: 2.62887
+MSE train y: 0.00005
+MSE train z: 0.00181 
+
+106  of  200  initial cond: [0.757, 0.625, 0.385]
+MSE train X: 2.32484
+MSE train y: 0.00013
+MSE train z: 0.01272 
+
+107  of  200  initial cond: [0.386, 0.663, 0.674]
+MSE train X: 9.06484
+MSE train y: 0.00038
+MSE train z: 0.00278 
+
+108  of  200  initial cond: [0.099, 0.448, 0.860]
+MSE train X: 35.55239
+MSE train y: 0.00169
+MSE train z: 0.00008 
+
+109  of  200  initial cond: [0.440, 0.764, 0.176]
+MSE train X: 4.36359
+MSE train y: 0.00024
+MSE train z: 0.02399 
+
+110  of  200  initial cond: [0.594, 0.428, 0.508]
+MSE train X: 11.09407
+MSE train y: 0.00031
+MSE train z: 0.00752 
+
+111  of  200  initial cond: [0.308, 0.021, 0.752]
+MSE train X: 52.93381
+MSE train y: 0.00199
+MSE train z: 0.00124 
+
+112  of  200  initial cond: [0.153, 0.097, 0.136]
+MSE train X: 59.64260
+MSE train y: 0.00240
+MSE train z: 0.02709 
+
+113  of  200  initial cond: [0.142, 0.174, 0.378]
+MSE train X: 53.40659
+MSE train y: 0.00232
+MSE train z: 0.01298 
+
+114  of  200  initial cond: [0.874, 0.076, 0.231]
+MSE train X: 18.69994
+MSE train y: 0.00112
+MSE train z: 0.02125 
+
+115  of  200  initial cond: [0.555, 0.382, 0.064]
+MSE train X: 14.37401
+MSE train y: 0.00033
+MSE train z: 0.03121 
+
+116  of  200  initial cond: [0.799, 0.203, 0.196]
+MSE train X: 14.72638
+MSE train y: 0.00058
+MSE train z: 0.02224 
+
+117  of  200  initial cond: [0.181, 0.929, 0.609]
+MSE train X: 8.09705
+MSE train y: 0.00085
+MSE train z: 0.00431 
+
+118  of  200  initial cond: [0.606, 0.916, 0.971]
+MSE train X: 0.09873
+MSE train y: 0.00001
+MSE train z: 0.00022 
+
+119  of  200  initial cond: [0.086, 0.350, 0.323]
+MSE train X: 43.66470
+MSE train y: 0.00209
+MSE train z: 0.01629 
+
+120  of  200  initial cond: [0.858, 0.752, 0.806]
+MSE train X: 1.15702
+MSE train y: 0.00031
+MSE train z: 0.00039 
+
+121  of  200  initial cond: [0.052, 0.850, 0.546]
+MSE train X: 16.53449
+MSE train y: 0.00154
+MSE train z: 0.00618 
+
+122  of  200  initial cond: [0.123, 0.051, 0.807]
+MSE train X: 66.65281
+MSE train y: 0.00303
+MSE train z: 0.00049 
+
+123  of  200  initial cond: [0.724, 0.856, 0.542]
+MSE train X: 0.20856
+MSE train y: 0.00003
+MSE train z: 0.00663 
+
+124  of  200  initial cond: [0.668, 0.264, 0.658]
+MSE train X: 15.83237
+MSE train y: 0.00046
+MSE train z: 0.00295 
+
+125  of  200  initial cond: [0.884, 0.239, 0.793]
+MSE train X: 11.35194
+MSE train y: 0.00078
+MSE train z: 0.00072 
+
+126  of  200  initial cond: [0.032, 0.124, 0.504]
+MSE train X: 68.58935
+MSE train y: 0.00329
+MSE train z: 0.00782 
+
+127  of  200  initial cond: [0.433, 0.423, 0.936]
+MSE train X: 17.43782
+MSE train y: 0.00052
+MSE train z: 0.00006 
+
+128  of  200  initial cond: [0.420, 0.413, 0.190]
+MSE train X: 18.53402
+MSE train y: 0.00059
+MSE train z: 0.02344 
+
+129  of  200  initial cond: [0.914, 0.899, 0.685]
+MSE train X: 2.40594
+MSE train y: 0.00037
+MSE train z: 0.00226 
+
+130  of  200  initial cond: [0.134, 0.220, 0.940]
+MSE train X: 50.40819
+MSE train y: 0.00228
+MSE train z: 0.00008 
+
+131  of  200  initial cond: [0.526, 0.831, 0.179]
+MSE train X: 1.51601
+MSE train y: 0.00008
+MSE train z: 0.02439 
+
+132  of  200  initial cond: [0.529, 0.896, 0.702]
+MSE train X: 0.72598
+MSE train y: 0.00006
+MSE train z: 0.00224 
+
+133  of  200  initial cond: [0.885, 0.463, 0.652]
+MSE train X: 4.68463
+MSE train y: 0.00055
+MSE train z: 0.00334 
+
+134  of  200  initial cond: [0.302, 0.405, 0.126]
+MSE train X: 25.06501
+MSE train y: 0.00103
+MSE train z: 0.02704 
+
+135  of  200  initial cond: [0.676, 0.781, 0.341]
+MSE train X: 0.70101
+MSE train y: 0.00002
+MSE train z: 0.01528 
+
+136  of  200  initial cond: [0.689, 0.513, 0.577]
+MSE train X: 5.75050
+MSE train y: 0.00016
+MSE train z: 0.00520 
+
+137  of  200  initial cond: [0.306, 0.442, 0.598]
+MSE train X: 22.80150
+MSE train y: 0.00087
+MSE train z: 0.00481 
+
+138  of  200  initial cond: [0.246, 0.415, 0.260]
+MSE train X: 27.86673
+MSE train y: 0.00118
+MSE train z: 0.01875 
+
+139  of  200  initial cond: [0.680, 0.235, 0.444]
+MSE train X: 16.87382
+MSE train y: 0.00055
+MSE train z: 0.01047 
+
+140  of  200  initial cond: [0.868, 0.770, 0.210]
+MSE train X: 1.19209
+MSE train y: 0.00025
+MSE train z: 0.02188 
+
+141  of  200  initial cond: [0.097, 0.024, 0.437]
+MSE train X: 71.33632
+MSE train y: 0.00349
+MSE train z: 0.01043 
+
+142  of  200  initial cond: [0.654, 0.765, 0.253]
+MSE train X: 0.98173
+MSE train y: 0.00005
+MSE train z: 0.02042 
+
+143  of  200  initial cond: [0.686, 0.124, 0.306]
+MSE train X: 22.36445
+MSE train y: 0.00102
+MSE train z: 0.01713 
+
+144  of  200  initial cond: [0.515, 0.390, 0.178]
+MSE train X: 15.55148
+MSE train y: 0.00042
+MSE train z: 0.02469 
+
+145  of  200  initial cond: [0.206, 0.916, 0.008]
+MSE train X: 7.62472
+MSE train y: 0.00079
+MSE train z: 0.03553 
+
+146  of  200  initial cond: [0.191, 0.656, 0.230]
+MSE train X: 17.77860
+MSE train y: 0.00100
+MSE train z: 0.02153 
+
+147  of  200  initial cond: [0.789, 0.782, 0.350]
+MSE train X: 0.64059
+MSE train y: 0.00012
+MSE train z: 0.01462 
+
+148  of  200  initial cond: [0.364, 0.717, 0.295]
+MSE train X: 7.95006
+MSE train y: 0.00040
+MSE train z: 0.01753 
+
+149  of  200  initial cond: [0.070, 0.611, 0.502]
+MSE train X: 27.24121
+MSE train y: 0.00168
+MSE train z: 0.00811 
+
+150  of  200  initial cond: [0.961, 0.305, 0.833]
+MSE train X: 8.22965
+MSE train y: 0.00078
+MSE train z: 0.00031 
+
+151  of  200  initial cond: [0.545, 0.879, 0.426]
+MSE train X: 0.70778
+MSE train y: 0.00004
+MSE train z: 0.01110 
+
+152  of  200  initial cond: [0.751, 0.515, 0.942]
+MSE train X: 4.64537
+MSE train y: 0.00028
+MSE train z: 0.00010 
+
+153  of  200  initial cond: [0.392, 0.926, 0.720]
+MSE train X: 2.42828
+MSE train y: 0.00025
+MSE train z: 0.00185 
+
+154  of  200  initial cond: [0.911, 0.656, 0.364]
+MSE train X: 1.95725
+MSE train y: 0.00045
+MSE train z: 0.01386 
+
+155  of  200  initial cond: [0.614, 0.983, 0.917]
+MSE train X: 0.03438
+MSE train y: 0.00000
+MSE train z: 0.00001 
+
+156  of  200  initial cond: [0.679, 0.819, 0.122]
+MSE train X: 0.37139
+MSE train y: 0.00002
+MSE train z: 0.02787 
+
+157  of  200  initial cond: [0.762, 0.252, 0.883]
+MSE train X: 13.56953
+MSE train y: 0.00052
+MSE train z: 0.00004 
+
+158  of  200  initial cond: [0.748, 0.824, 0.445]
+MSE train X: 0.35812
+MSE train y: 0.00013
+MSE train z: 0.01027 
+
+159  of  200  initial cond: [0.864, 0.508, 0.469]
+MSE train X: 3.89055
+MSE train y: 0.00048
+MSE train z: 0.00920 
+
+160  of  200  initial cond: [0.624, 0.248, 0.157]
+MSE train X: 18.18046
+MSE train y: 0.00068
+MSE train z: 0.02605 
+
+161  of  200  initial cond: [0.007, 0.030, 0.129]
+MSE train X: 79.95382
+MSE train y: 0.00431
+MSE train z: 0.02791 
+
+162  of  200  initial cond: [0.924, 0.601, 0.759]
+MSE train X: 2.47297
+MSE train y: 0.00057
+MSE train z: 0.00105 
+
+163  of  200  initial cond: [0.772, 0.950, 0.026]
+MSE train X: 0.78173
+MSE train y: 0.00011
+MSE train z: 0.03413 
+
+164  of  200  initial cond: [0.551, 0.998, 0.161]
+MSE train X: 0.12827
+MSE train y: 0.00004
+MSE train z: 0.02613 
+
+165  of  200  initial cond: [0.310, 0.360, 0.795]
+MSE train X: 27.23956
+MSE train y: 0.00106
+MSE train z: 0.00071 
+
+166  of  200  initial cond: [0.834, 0.830, 0.848]
+MSE train X: 0.87953
+MSE train y: 0.00024
+MSE train z: 0.00017 
+
+167  of  200  initial cond: [0.179, 0.555, 0.345]
+MSE train X: 23.75965
+MSE train y: 0.00121
+MSE train z: 0.01537 
+
+168  of  200  initial cond: [0.223, 0.297, 0.283]
+MSE train X: 37.20423
+MSE train y: 0.00169
+MSE train z: 0.01857 
+
+169  of  200  initial cond: [0.764, 0.553, 0.093]
+MSE train X: 3.57997
+MSE train y: 0.00021
+MSE train z: 0.02993 
+
+170  of  200  initial cond: [0.550, 0.253, 0.717]
+MSE train X: 20.97357
+MSE train y: 0.00064
+MSE train z: 0.00190 
+
+171  of  200  initial cond: [0.821, 0.425, 0.925]
+MSE train X: 6.09257
+MSE train y: 0.00035
+MSE train z: 0.00003 
+
+172  of  200  initial cond: [0.418, 0.678, 0.390]
+MSE train X: 7.39779
+MSE train y: 0.00031
+MSE train z: 0.01341 
+
+173  of  200  initial cond: [0.143, 0.728, 0.665]
+MSE train X: 17.07118
+MSE train y: 0.00116
+MSE train z: 0.00324 
+
+174  of  200  initial cond: [0.570, 0.757, 1.000]
+MSE train X: 2.01690
+MSE train y: 0.00005
+MSE train z: 0.00046 
+
+175  of  200  initial cond: [0.949, 0.260, 0.725]
+MSE train X: 9.52102
+MSE train y: 0.00093
+MSE train z: 0.00186 
+
+176  of  200  initial cond: [0.639, 0.192, 0.333]
+MSE train X: 20.32102
+MSE train y: 0.00074
+MSE train z: 0.01563 
+
+177  of  200  initial cond: [0.768, 0.718, 0.419]
+MSE train X: 1.01591
+MSE train y: 0.00010
+MSE train z: 0.01167 
+
+178  of  200  initial cond: [0.809, 0.574, 0.192]
+MSE train X: 2.83031
+MSE train y: 0.00025
+MSE train z: 0.02324 
+
+179  of  200  initial cond: [0.178, 0.517, 0.523]
+MSE train X: 25.86089
+MSE train y: 0.00131
+MSE train z: 0.00732 
+
+180  of  200  initial cond: [0.713, 0.807, 0.684]
+MSE train X: 0.38342
+MSE train y: 0.00003
+MSE train z: 0.00270 
+
+181  of  200  initial cond: [0.528, 0.910, 0.985]
+MSE train X: 0.63495
+MSE train y: 0.00004
+MSE train z: 0.00033 
+
+182  of  200  initial cond: [0.256, 0.711, 0.424]
+MSE train X: 12.33574
+MSE train y: 0.00073
+MSE train z: 0.01131 
+
+183  of  200  initial cond: [0.766, 0.328, 0.197]
+MSE train X: 10.18230
+MSE train y: 0.00045
+MSE train z: 0.02388 
+
+184  of  200  initial cond: [0.130, 0.926, 0.502]
+MSE train X: 10.32239
+MSE train y: 0.00114
+MSE train z: 0.00816 
+
+185  of  200  initial cond: [0.690, 0.565, 0.516]
+MSE train X: 4.28276
+MSE train y: 0.00019
+MSE train z: 0.00758 
+
+186  of  200  initial cond: [0.393, 0.897, 0.052]
+MSE train X: 2.80224
+MSE train y: 0.00025
+MSE train z: 0.03277 
+
+187  of  200  initial cond: [0.138, 0.349, 0.270]
+MSE train X: 39.84688
+MSE train y: 0.00192
+MSE train z: 0.01979 
+
+188  of  200  initial cond: [0.304, 0.928, 0.828]
+MSE train X: 4.37951
+MSE train y: 0.00049
+MSE train z: 0.00039 
+
+189  of  200  initial cond: [0.248, 0.442, 0.574]
+MSE train X: 26.03097
+MSE train y: 0.00115
+MSE train z: 0.00570 
+
+190  of  200  initial cond: [0.913, 0.350, 0.167]
+MSE train X: 7.18076
+MSE train y: 0.00077
+MSE train z: 0.02503 
+
+191  of  200  initial cond: [0.290, 0.046, 0.914]
+MSE train X: 51.91317
+MSE train y: 0.00225
+MSE train z: 0.00001 
+
+192  of  200  initial cond: [0.266, 0.676, 0.274]
+MSE train X: 13.30688
+MSE train y: 0.00076
+MSE train z: 0.01920 
+
+193  of  200  initial cond: [0.066, 0.321, 0.697]
+MSE train X: 47.52212
+MSE train y: 0.00248
+MSE train z: 0.00224 
+
+194  of  200  initial cond: [0.041, 0.136, 0.712]
+MSE train X: 66.08480
+MSE train y: 0.00337
+MSE train z: 0.00214 
+
+195  of  200  initial cond: [0.579, 0.410, 0.736]
+MSE train X: 12.16039
+MSE train y: 0.00045
+MSE train z: 0.00169 
+
+196  of  200  initial cond: [0.743, 0.451, 0.138]
+MSE train X: 6.51513
+MSE train y: 0.00035
+MSE train z: 0.02712 
+
+197  of  200  initial cond: [0.563, 0.906, 0.531]
+MSE train X: 0.35328
+MSE train y: 0.00003
+MSE train z: 0.00715 
+
+198  of  200  initial cond: [0.473, 0.502, 0.988]
+MSE train X: 11.99992
+MSE train y: 0.00036
+MSE train z: 0.00041 
+
+199  of  200  initial cond: [0.973, 0.075, 0.807]
+MSE train X: 16.09599
+MSE train y: 0.00136
+MSE train z: 0.00057 
+
+200  of  200  initial cond: [0.835, 0.421, 0.182]
+MSE train X: 6.00295
+MSE train y: 0.00034
+MSE train z: 0.02426 
+
+Testing network
+1  of  50  initial cond: [0.146, 0.506, 0.615]
+MSE test X: 28.55691
+MSE test y: 58.45969
+MSE test z: 1068.55849
+r2 test X:  0.798839830364
+r2 test y:  0.98647220894
+r2 test z:  0.990877162213 
+
+2  of  50  initial cond: [0.636, 0.616, 0.574]
+MSE test X: 3.87354
+MSE test y: 2.47367
+MSE test z: 1387.35955
+r2 test X:  0.96725546117
+r2 test y:  0.99928157571
+r2 test z:  0.988155429877 
+
+3  of  50  initial cond: [0.204, 0.408, 0.870]
+MSE test X: 30.93422
+MSE test y: 55.02034
+MSE test z: 13.41065
+r2 test X:  0.777543958156
+r2 test y:  0.986939290697
+r2 test z:  0.999885506703 
+
+4  of  50  initial cond: [0.375, 0.863, 0.680]
+MSE test X: 3.83435
+MSE test y: 14.00708
+MSE test z: 647.06724
+r2 test X:  0.970647052657
+r2 test y:  0.996406990015
+r2 test z:  0.994475669512 
+
+5  of  50  initial cond: [0.381, 0.154, 0.180]
+MSE test X: 36.63350
+MSE test y: 53.80484
+MSE test z: 6103.75724
+r2 test X:  0.718902863769
+r2 test y:  0.986157992078
+r2 test z:  0.947889077309 
+
+6  of  50  initial cond: [0.049, 0.285, 0.504]
+MSE test X: 52.10909
+MSE test y: 104.66891
+MSE test z: 2010.11191
+r2 test X:  0.645362540187
+r2 test y:  0.976783873348
+r2 test z:  0.982838642298 
+
+7  of  50  initial cond: [0.229, 0.698, 0.225]
+MSE test X: 14.04840
+MSE test y: 34.81100
+MSE test z: 5431.13140
+r2 test X:  0.898057291877
+r2 test y:  0.991643788977
+r2 test z:  0.953631592223 
+
+8  of  50  initial cond: [0.327, 0.508, 0.823]
+MSE test X: 18.10142
+MSE test y: 28.51529
+MSE test z: 83.00098
+r2 test X:  0.863890645859
+r2 test y:  0.992846617229
+r2 test z:  0.999291379933 
+
+9  of  50  initial cond: [0.190, 0.835, 0.067]
+MSE test X: 10.65048
+MSE test y: 38.52868
+MSE test z: 7888.97083
+r2 test X:  0.923794093319
+r2 test y:  0.990910736067
+r2 test z:  0.932647860394 
+
+10  of  50  initial cond: [0.239, 0.789, 0.405]
+MSE test X: 10.21162
+MSE test y: 31.49166
+MSE test z: 3073.95842
+r2 test X:  0.925639714495
+r2 test y:  0.992407845957
+r2 test z:  0.97375603284 
+
+11  of  50  initial cond: [0.287, 0.643, 0.025]
+MSE test X: 13.72100
+MSE test y: 27.97212
+MSE test z: 8596.66623
+r2 test X:  0.898311635746
+r2 test y:  0.993107847715
+r2 test z:  0.926605897288 
+
+12  of  50  initial cond: [0.300, 0.410, 0.210]
+MSE test X: 24.83165
+MSE test y: 38.62733
+MSE test z: 5656.73552
+r2 test X:  0.815090147576
+r2 test y:  0.99042607391
+r2 test z:  0.951705578681 
+
+13  of  50  initial cond: [0.709, 0.799, 0.070]
+MSE test X: 0.42974
+MSE test y: 0.75487
+MSE test z: 7839.85322
+r2 test X:  0.996261128041
+r2 test y:  0.999772652985
+r2 test z:  0.933067055745 
+
+14  of  50  initial cond: [0.552, 0.561, 0.768]
+MSE test X: 7.27079
+MSE test y: 6.30813
+MSE test z: 237.48335
+r2 test X:  0.940490641325
+r2 test y:  0.998240846393
+r2 test z:  0.997972488953 
+
+15  of  50  initial cond: [0.955, 0.461, 0.308]
+MSE test X: 4.47207
+MSE test y: 22.88811
+MSE test z: 4282.43414
+r2 test X:  0.95700026449
+r2 test y:  0.992170836054
+r2 test z:  0.963438758427 
+
+16  of  50  initial cond: [0.453, 0.156, 0.665]
+MSE test X: 31.99711
+MSE test y: 44.06704
+MSE test z: 736.83139
+r2 test X:  0.747836425513
+r2 test y:  0.988279473892
+r2 test z:  0.993709311091 
+
+17  of  50  initial cond: [0.693, 0.488, 0.407]
+MSE test X: 6.27544
+MSE test y: 6.07456
+MSE test z: 3048.93104
+r2 test X:  0.945747007609
+r2 test y:  0.998185091916
+r2 test z:  0.973969731885 
+
+18  of  50  initial cond: [0.944, 0.913, 0.133]
+MSE test X: 3.21662
+MSE test y: 17.81862
+MSE test z: 6827.98752
+r2 test X:  0.969218609108
+r2 test y:  0.993942028203
+r2 test z:  0.941705932407 
+
+19  of  50  initial cond: [0.362, 0.711, 0.236]
+MSE test X: 8.21817
+MSE test y: 16.99210
+MSE test z: 5269.42638
+r2 test X:  0.937389127988
+r2 test y:  0.995667250582
+r2 test z:  0.955012189278 
+
+20  of  50  initial cond: [0.727, 0.856, 0.704]
+MSE test X: 0.21405
+MSE test y: 1.20575
+MSE test z: 516.04125
+r2 test X:  0.998124135415
+r2 test y:  0.999633508723
+r2 test z:  0.995594294673 
+
+21  of  50  initial cond: [0.846, 0.282, 0.219]
+MSE test X: 10.21034
+MSE test y: 21.16523
+MSE test z: 5514.87096
+r2 test X:  0.906159740793
+r2 test y:  0.993166047608
+r2 test z:  0.952916762294 
+
+22  of  50  initial cond: [0.654, 0.188, 0.076]
+MSE test X: 19.92293
+MSE test y: 25.55253
+MSE test z: 7748.91617
+r2 test X:  0.830350143099
+r2 test y:  0.992510225849
+r2 test z:  0.933843539837 
+
+23  of  50  initial cond: [0.039, 0.322, 0.725]
+MSE test X: 49.89762
+MSE test y: 102.04269
+MSE test z: 415.29945
+r2 test X:  0.661586975341
+r2 test y:  0.977462356446
+r2 test z:  0.996454379896 
+
+24  of  50  initial cond: [0.719, 0.606, 0.575]
+MSE test X: 2.93455
+MSE test y: 3.11249
+MSE test z: 1382.21751
+r2 test X:  0.974363280621
+r2 test y:  0.999057694503
+r2 test z:  0.988199331205 
+
+25  of  50  initial cond: [0.385, 0.084, 0.701]
+MSE test X: 41.63668
+MSE test y: 63.73813
+MSE test z: 535.80385
+r2 test X:  0.680150083463
+r2 test y:  0.983579319766
+r2 test z:  0.995425592181 
+
+26  of  50  initial cond: [0.096, 0.385, 0.732]
+MSE test X: 40.32134
+MSE test y: 80.05395
+MSE test z: 380.53424
+r2 test X:  0.721002042998
+r2 test y:  0.981878467787
+r2 test z:  0.996751187206 
+
+27  of  50  initial cond: [0.136, 0.660, 0.341]
+MSE test X: 20.59689
+MSE test y: 52.22902
+MSE test z: 3849.21754
+r2 test X:  0.855466508523
+r2 test y:  0.987970905578
+r2 test z:  0.967137251339 
+
+28  of  50  initial cond: [0.840, 0.635, 0.662]
+MSE test X: 1.86350
+MSE test y: 8.19451
+MSE test z: 756.97344
+r2 test X:  0.982914332699
+r2 test y:  0.997362228794
+r2 test z:  0.993537336881 
+
+29  of  50  initial cond: [0.704, 0.338, 0.951]
+MSE test X: 11.25979
+MSE test y: 13.32794
+MSE test z: 38.53299
+r2 test X:  0.902228734062
+r2 test y:  0.995995892857
+r2 test z:  0.999671024894 
+
+30  of  50  initial cond: [0.549, 0.234, 0.532]
+MSE test X: 22.03108
+MSE test y: 26.48756
+MSE test z: 1753.97176
+r2 test X:  0.819921936907
+r2 test y:  0.992625730187
+r2 test z:  0.985025480371 
+
+31  of  50  initial cond: [0.286, 0.635, 0.171]
+MSE test X: 14.08849
+MSE test y: 28.33677
+MSE test z: 6245.04440
+r2 test X:  0.895616041476
+r2 test y:  0.993020313503
+r2 test z:  0.946682831404 
+
+32  of  50  initial cond: [0.030, 0.357, 0.792]
+MSE test X: 47.84832
+MSE test y: 99.78852
+MSE test z: 161.55005
+r2 test X:  0.676457846598
+r2 test y:  0.978041178536
+r2 test z:  0.998620769239 
+
+33  of  50  initial cond: [0.509, 0.182, 0.162]
+MSE test X: 27.04719
+MSE test y: 34.94772
+MSE test z: 6372.61064
+r2 test X:  0.782225698627
+r2 test y:  0.990452319078
+r2 test z:  0.945593766523 
+
+34  of  50  initial cond: [0.111, 0.898, 0.648]
+MSE test X: 11.95207
+MSE test y: 51.99010
+MSE test z: 847.99684
+r2 test X:  0.916859228479
+r2 test y:  0.988154096152
+r2 test z:  0.992760224321 
+
+35  of  50  initial cond: [0.514, 0.566, 0.376]
+MSE test X: 8.17681
+MSE test y: 8.10654
+MSE test z: 3417.30910
+r2 test X:  0.934039590339
+r2 test y:  0.997780094339
+r2 test z:  0.970824634414 
+
+36  of  50  initial cond: [0.370, 0.909, 0.188]
+MSE test X: 3.13116
+MSE test y: 14.49520
+MSE test z: 5979.17975
+r2 test X:  0.97607713541
+r2 test y:  0.996290855887
+r2 test z:  0.948952632398 
+
+37  of  50  initial cond: [0.810, 0.148, 0.543]
+MSE test X: 16.57606
+MSE test y: 29.62517
+MSE test z: 1653.27379
+r2 test X:  0.84982519995
+r2 test y:  0.990607597821
+r2 test z:  0.985885165711 
+
+38  of  50  initial cond: [0.697, 0.494, 0.087]
+MSE test X: 6.02026
+MSE test y: 5.89330
+MSE test z: 7568.68140
+r2 test X:  0.947865992206
+r2 test y:  0.998235520575
+r2 test z:  0.935382287996 
+
+39  of  50  initial cond: [0.916, 0.379, 0.852]
+MSE test X: 6.36647
+MSE test y: 21.59282
+MSE test z: 32.12973
+r2 test X:  0.939787605612
+r2 test y:  0.992768401145
+r2 test z:  0.999725692693 
+
+40  of  50  initial cond: [0.866, 0.190, 0.952]
+MSE test X: 13.32473
+MSE test y: 28.82110
+MSE test z: 39.22715
+r2 test X:  0.876499995985
+r2 test y:  0.990593585823
+r2 test z:  0.999665098981 
+
+41  of  50  initial cond: [0.278, 0.993, 0.892]
+MSE test X: 3.92913
+MSE test y: 25.40159
+MSE test z: 1.54220
+r2 test X:  0.97097394608
+r2 test y:  0.993766056326
+r2 test z:  0.999986833462 
+
+42  of  50  initial cond: [0.036, 0.936, 0.176]
+MSE test X: 14.13654
+MSE test y: 66.81674
+MSE test z: 6154.55767
+r2 test X:  0.904207780888
+r2 test y:  0.985258381718
+r2 test z:  0.947455314302 
+
+43  of  50  initial cond: [0.757, 0.665, 0.367]
+MSE test X: 1.65663
+MSE test y: 3.22844
+MSE test z: 3516.86303
+r2 test X:  0.985311225618
+r2 test y:  0.99900406497
+r2 test z:  0.969974758756 
+
+44  of  50  initial cond: [0.796, 0.837, 0.768]
+MSE test X: 0.57246
+MSE test y: 4.16012
+MSE test z: 239.14933
+r2 test X:  0.994844075765
+r2 test y:  0.99869088386
+r2 test z:  0.997958264983 
+
+45  of  50  initial cond: [0.331, 0.130, 0.634]
+MSE test X: 41.95273
+MSE test y: 65.46738
+MSE test z: 940.01100
+r2 test X:  0.684074703029
+r2 test y:  0.983546264833
+r2 test z:  0.991974666992 
+
+46  of  50  initial cond: [0.861, 0.302, 0.855]
+MSE test X: 9.26751
+MSE test y: 20.92693
+MSE test z: 28.58769
+r2 test X:  0.914307632713
+r2 test y:  0.993190644307
+r2 test z:  0.999755932826 
+
+47  of  50  initial cond: [0.664, 0.172, 0.932]
+MSE test X: 20.43412
+MSE test y: 26.89536
+MSE test z: 16.09140
+r2 test X:  0.825356936821
+r2 test y:  0.992080010603
+r2 test z:  0.999862620083 
+
+48  of  50  initial cond: [0.791, 0.496, 0.760]
+MSE test X: 4.57971
+MSE test y: 8.42406
+MSE test z: 265.65490
+r2 test X:  0.958824624912
+r2 test y:  0.997355012342
+r2 test z:  0.997731972825 
+
+49  of  50  initial cond: [0.802, 0.140, 0.567]
+MSE test X: 17.19497
+MSE test y: 30.09959
+MSE test z: 1446.62526
+r2 test X:  0.844730412888
+r2 test y:  0.990497065293
+r2 test z:  0.987649426558 
+
+50  of  50  initial cond: [0.228, 0.019, 0.805]
+MSE test X: 59.55713
+MSE test y: 107.05410
+MSE test z: 125.17574
+r2 test X:  0.568065661792
+r2 test y:  0.97432008429
+r2 test z:  0.998931314694 
+
+
